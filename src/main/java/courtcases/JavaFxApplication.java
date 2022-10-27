@@ -24,7 +24,7 @@ public class JavaFxApplication extends Application {
 		Parent parent = fxWeaver.loadView(MainController.class);
 		Scene scene = new Scene(parent);
 		stage.setScene(scene);
-		stage.setTitle("Авторизация");
+		stage.setTitle("База данных судебных дел");
 		stage.show();
 	}
 
