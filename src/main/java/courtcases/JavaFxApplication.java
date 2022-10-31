@@ -21,10 +21,10 @@ public class JavaFxApplication extends Application {
 	@Override
 	public void start(Stage stage) {
 		FxWeaver fxWeaver = appContext.getBean(FxWeaver.class);
-		Parent parent = fxWeaver.loadView(MainController.class);
+		Parent parent = fxWeaver.loadView(LoginController.class);
 		Scene scene = new Scene(parent);
 		stage.setScene(scene);
-		stage.setTitle("База данных судебных дел");
+		stage.setTitle("Авторизация");
 		stage.show();
 	}
 
