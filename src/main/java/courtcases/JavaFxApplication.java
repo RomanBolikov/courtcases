@@ -4,10 +4,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
-import net.rgielen.fxweaver.core.FxWeaver;
 
 public class JavaFxApplication extends Application {
 	private ConfigurableApplicationContext appContext;
@@ -19,13 +16,8 @@ public class JavaFxApplication extends Application {
 	}
 
 	@Override
-	public void start(Stage stage) {
-		FxWeaver fxWeaver = appContext.getBean(FxWeaver.class);
-		Parent parent = fxWeaver.loadView(LoginController.class);
-		Scene scene = new Scene(parent);
-		stage.setScene(scene);
-		stage.setTitle("Авторизация");
-		stage.show();
+	public void start(Stage primaryStage) {
+		appContext.publishEvent(new StageReadyEvent(primaryStage));
 	}
 
 	public void stop() {

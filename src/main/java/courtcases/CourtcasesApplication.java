@@ -1,7 +1,6 @@
 package courtcases;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-//import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import javafx.application.Application;
 
 @SpringBootApplication

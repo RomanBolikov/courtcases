@@ -9,7 +9,7 @@
 <VBox alignment="BOTTOM_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" 
 		prefHeight="250.0" prefWidth="430.0" spacing="10.0" style="-fx-background-color: rgb(25, 200, 235);" 
 		xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" 
-		fx:controller="courtcases.LoginController">
+		fx:controller="courtcases.controllers.LoginController">
    <children>
       <Label alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" prefHeight="69.0" prefWidth="294.0" text="База данных судебных дел" textFill="#9e4437">
          <padding>

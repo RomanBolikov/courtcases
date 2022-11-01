@@ -1,4 +1,4 @@
-package courtcases;
+package courtcases.data;
 
 public class DatabaseModel {
 
