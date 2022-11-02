@@ -6,10 +6,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="BOTTOM_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" 
-		prefHeight="250.0" prefWidth="430.0" spacing="10.0" style="-fx-background-color: rgb(25, 200, 235);" 
-		xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" 
-		fx:controller="courtcases.controllers.LoginController">
+<VBox alignment="BOTTOM_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="430.0" spacing="10.0" style="-fx-background-color: rgb(25, 200, 235);" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="courtcases.controllers.LoginController">
    <children>
       <Label alignment="CENTER" contentDisplay="CENTER" minHeight="-Infinity" prefHeight="69.0" prefWidth="294.0" text="База данных судебных дел" textFill="#9e4437">
          <padding>
@@ -19,9 +16,9 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <Button defaultButton="true" mnemonicParsing="false" onAction="#selectUser" text="Войти как пользователь" />
-      <Button mnemonicParsing="false" onAction="#loginAsAdmin" text="Войти как администратор" />
-      <Button cancelButton="true" mnemonicParsing="false" onAction="#quit" text="Выйти" />
+      <Button fx:id="chooseUserButton" mnemonicParsing="false" onAction="#chooseUser" text="Выбрать пользователя" />
+      <Button fx:id="adminButton" mnemonicParsing="false" onAction="#loginAsAdmin" text="Войти как администратор" />
+      <Button fx:id="quitButton" cancelButton="true" mnemonicParsing="false" onAction="#quit" text="Выйти" />
    </children>
    <padding>
       <Insets bottom="30.0" top="40.0" />
