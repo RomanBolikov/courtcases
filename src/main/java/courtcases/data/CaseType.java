@@ -2,6 +2,8 @@ package courtcases.data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -10,25 +12,17 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @Entity
-public class Representative {
-
-	@Column(name = "repr_id")
+public class CaseType {
+	
+	@Column(name = "type_id")
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Id
 	private Integer id;
-
-	private String name;
-
-	private String password;
 	
-	@Column(name = "isadmin")
-	private Boolean isAdmin;
-
+	@Column
+	private String type;
+	
 	public String toString() {
-		return name;
+		return type;
 	}
-	
-	public boolean isAdmin() {
-		return isAdmin;
-	}
-	
 }
