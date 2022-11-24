@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import courtcases.customGUI.ConfirmationAlert;
 import courtcases.data.ACase;
 import courtcases.data.CaseRepo;
-import courtcases.data.CaseType;
 import courtcases.data.CaseTypeRepo;
 import courtcases.data.Court;
 import courtcases.data.CourtRepo;
@@ -25,23 +24,14 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
 @FxmlView("addcase.fxml")
-public class AddCaseController {
+public class AddCaseController extends FormController {
 	private Stage stage;
 
 	private ObservableList<ACase> caseList;
@@ -68,57 +58,7 @@ public class AddCaseController {
 		this.courtRepo = courtRepo;
 	}
 
-// 	FXML GUI elements
-
-	@FXML
-	private GridPane gridPane;
-
-	@FXML
-	private ChoiceBox<CaseType> caseTypeChoiceBox;
-
-	@FXML
-	private ChoiceBox<Relation> relationChoiceBox;
-
-	@FXML
-	private ChoiceBox<Representative> representativeChoiceBox;
-
-	@FXML
-	private ComboBox<Court> courtComboBox;
-
-	@FXML
-	private TextField caseNoTextField;
-
-	@FXML
-	private ChoiceBox<courtcases.data.Stage> stageChoiceBox;
-
-	@FXML
-	private DatePicker currDatePicker;
-
-	@FXML
-	private TextField hourTextField;
-
-	@FXML
-	private TextField minuteTextField;
-
-	@FXML
-	private TextArea description;
-
-	@FXML
-	private TextField plaintiffTextField;
-
-	@FXML
-	private TextField defendantTextField;
-
-	@FXML
-	private TextArea currentState;
-
-	@FXML
-	private Button saveButton;
-
-//  *********************************************
-
-// 	FXML-annotated methods
-
+	@Override
 	@FXML
 	public void initialize() {
 		this.stage = new Stage();
@@ -145,7 +85,8 @@ public class AddCaseController {
 			}
 		});
 	}
-
+	
+	@Override
 	@FXML
 	public void saveCase(ActionEvent actionEvent) {
 		if (!isInputCorrect()) {
@@ -207,16 +148,5 @@ public class AddCaseController {
 			plaintiffTextField.setDisable(false);
 			defendantTextField.setDisable(false);
 		}
-	}
-
-	private boolean isInputCorrect() {
-		return relationChoiceBox.getValue() != null && caseTypeChoiceBox.getValue() != null
-				&& description.getText() != null && courtComboBox.getValue() != null
-				&& plaintiffTextField.getText() != "" && defendantTextField.getText() != ""
-				&& stageChoiceBox.getValue() != null && currentState.getText() != "";
-	}
-
-	private void displayErrors() {
-		new Alert(AlertType.ERROR, "Проверьте заполнение полей!", ButtonType.OK).show();
 	}
 }
