@@ -58,31 +58,31 @@
                <graphic>
                   <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@add.png" />
+                        <Image url="@../images/add.png" />
                      </image>
                   </ImageView>
                </graphic>
             </Button>
-            <Button contentDisplay="TOP" disable="true" mnemonicParsing="false" prefHeight="60.0" prefWidth="130.0" text="Редактировать" textAlignment="CENTER" wrapText="true">
+            <Button fx:id="editCaseButton" contentDisplay="TOP" disable="true" mnemonicParsing="false" onAction="#editCase" prefHeight="60.0" prefWidth="130.0" text="Редактировать" textAlignment="CENTER" wrapText="true">
                <font>
                   <Font name="Arial Unicode MS" size="14.0" />
                </font>
                <graphic>
                   <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@edit.png" />
+                        <Image url="@../images/edit.png" />
                      </image>
                   </ImageView>
                </graphic>
             </Button>
-          <Button fx:id="moveCaseToArchiveButton" contentDisplay="TOP" disable="true" mnemonicParsing="false" prefHeight="60.0" prefWidth="130.0" text="В архив">
+          <Button fx:id="archiveButton" contentDisplay="TOP" disable="true" mnemonicParsing="false" prefHeight="60.0" prefWidth="130.0" text="В архив">
                <font>
                   <Font name="Arial Unicode MS" size="14.0" />
                </font>
                <graphic>
-                  <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@remove.png" />
+                  <ImageView fx:id="archiveIcon" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                  	<image>
+                        <Image url="@../images/remove.png" />
                      </image>
                   </ImageView>
                </graphic>
@@ -94,7 +94,7 @@
                <graphic>
                   <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@excel.png" />
+                        <Image url="@../images/excel.png" />
                      </image>
                   </ImageView>
                </graphic>
@@ -107,7 +107,7 @@
             <Insets />
          </GridPane.margin>
       </HBox>
-      <TableView id="tableview" fx:id="tableView" GridPane.columnSpan="3" GridPane.rowIndex="2">
+      <TableView id="tableview" fx:id="tableView" style="-fx-selection-bar: #E1E1E1;" GridPane.columnSpan="3" GridPane.rowIndex="2">
         <columns>
             <TableColumn fx:id="titleColumn" minWidth="0.0" prefWidth="121.33333992958069" text="Заголовок дела" />
           <TableColumn fx:id="courtColumn" minWidth="0.0" prefWidth="90.66666412353516" text="Суд" />

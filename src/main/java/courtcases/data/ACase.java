@@ -73,7 +73,7 @@ public class ACase {
 	@Column(nullable = false)
 	private String curr_state;
 	
-	@Column(name = "isarchive", columnDefinition = "tinyint(1) default false", nullable = false)
+	@Column(name = "isarchive", nullable = false)
 	private Boolean isArchive = false;
 
 	public String toString() {

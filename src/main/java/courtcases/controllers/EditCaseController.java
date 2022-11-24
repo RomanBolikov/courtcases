@@ -21,7 +21,6 @@ import courtcases.data.Representative;
 import courtcases.data.RepresentativeRepo;
 import courtcases.data.StageRepo;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -41,10 +40,10 @@ import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
 @FxmlView("addcase.fxml")
-public class AddCaseController {
+public class EditCaseController {
 	private Stage stage;
 
-	private ObservableList<ACase> caseList;
+	private ACase caseToEdit;
 
 	private final CaseRepo caseRepo;
 
@@ -58,7 +57,7 @@ public class AddCaseController {
 
 	private final CourtRepo courtRepo;
 
-	public AddCaseController(CaseRepo caseRepo, RepresentativeRepo reprRepo, CaseTypeRepo caseTypeRepo,
+	public EditCaseController(CaseRepo caseRepo, RepresentativeRepo reprRepo, CaseTypeRepo caseTypeRepo,
 			RelationRepo relationRepo, StageRepo stageRepo, CourtRepo courtRepo) {
 		this.caseRepo = caseRepo;
 		this.reprRepo = reprRepo;
@@ -122,12 +121,11 @@ public class AddCaseController {
 	@FXML
 	public void initialize() {
 		this.stage = new Stage();
-		stage.setTitle("Добавление нового дела");
+		stage.setTitle("Редактирование дела");
 		stage.setResizable(false);
 		stage.setScene(new Scene(gridPane));
 		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(caseTypeRepo.findAll()));
 		relationChoiceBox.setItems(FXCollections.observableArrayList(relationRepo.findAll()));
-		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> setRestrictions(newVal));
 		representativeChoiceBox.setItems(FXCollections.observableArrayList(reprRepo.findAll()));
 		stageChoiceBox.setItems(FXCollections.observableArrayList(stageRepo.findAll()));
 		courtComboBox.setItems(FXCollections.observableArrayList(courtRepo.findAll()));
@@ -175,8 +173,7 @@ public class AddCaseController {
 					newCase.setCurr_date(null);
 				}
 			}
-			newCase = caseRepo.save(newCase);
-			caseList.addAll(newCase);
+			caseRepo.save(caseToEdit);
 			new ConfirmationAlert("Подтверждение", "", "Дело внесено в базу данных!", ButtonType.OK).show();
 			stage.close();
 		}
@@ -184,26 +181,68 @@ public class AddCaseController {
 
 //	***************************************************************************
 
-	public void show(ObservableList<ACase> caseList, Representative user) {
-		this.caseList = caseList;
-		representativeChoiceBox.setValue(user);
-		if (!user.isAdmin())
-			representativeChoiceBox.setDisable(true);
-		stage.show();
+	public void show(ACase caseToEdit) {
+		this.caseToEdit = caseToEdit;
+		Relation relation = caseToEdit.getRelation();
+		Timestamp curr_date = caseToEdit.getCurr_date();
+		LocalDate date;
+		int hours, mins;
+
+		// setting inputs according to the current data stored in DB
+		plaintiffTextField.setText(caseToEdit.getPlaintiff());
+		defendantTextField.setText(caseToEdit.getDefendant());
+		caseTypeChoiceBox.setValue(caseToEdit.getCase_type());
+		relationChoiceBox.setValue(relation);
+		representativeChoiceBox.setValue(caseToEdit.getRepr());
+		stageChoiceBox.setValue(caseToEdit.getStage());
+		courtComboBox.setValue(caseToEdit.getCourt());
+		caseNoTextField.setText(caseToEdit.getCase_no());
+		description.setText(caseToEdit.getTitle());
+		currentState.setText(caseToEdit.getCurr_state());
+		if (curr_date != null) {
+			date = curr_date.toLocalDateTime().toLocalDate();
+			hours = curr_date.toLocalDateTime().getHour();
+			mins = curr_date.toLocalDateTime().getMinute();
+			currDatePicker.setValue(date);
+			hourTextField.setText(String.valueOf(hours));
+			minuteTextField.setText(String.valueOf(mins));
+		}
+
+		// adding listeners to avoid extra DB operations
+		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> setRestrictions(newVal));
+		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setRelation(newVal));
+		caseTypeChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setCase_type(newVal));
+		representativeChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setRepr(newVal));
+		stageChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setStage(newVal));
+		courtComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+			Court court = newVal;
+			Optional<Court> courtInDB = courtRepo.findByName(court.getName());
+			if (courtInDB.isPresent())
+				court = courtInDB.get();
+			else
+				court = courtRepo.save(court);
+			caseToEdit.setCourt(court);
+		});
+//		currDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
+//			if (currDatePicker.getValue() != null && hourTextField.getText() != "" && minuteTextField.getText() != "") {
+//				try {
+//					LocalTime time = LocalTime.of(
+//							Integer.parseInt(hourTextField.getText()), Integer.parseInt(minuteTextField.getText()));
+//					caseToEdit.setCurr_date(Timestamp.valueOf(LocalDateTime.of(currDatePicker.getValue(), time)));
+//				} catch (NumberFormatException e) {
+//					caseToEdit.setCurr_date(null);
+//				}
+//			}
+//		});
+//		TODO: read StringPropertyValues from text inputs
 	}
 
 	private void setRestrictions(Relation relation) {
-		if (relation.getId() == 1) {
-			plaintiffTextField.setText("Минстрой края");
+		if (relation.getId() == 1)
 			plaintiffTextField.setDisable(true);
-			defendantTextField.setDisable(false);
-			defendantTextField.setText("");
-		} else if (relation.getId() == 2) {
-			plaintiffTextField.setDisable(false);
-			plaintiffTextField.setText("");
-			defendantTextField.setText("Минстрой края");
+		else if (relation.getId() == 2)
 			defendantTextField.setDisable(true);
-		} else {
+		else {
 			plaintiffTextField.setDisable(false);
 			defendantTextField.setDisable(false);
 		}
