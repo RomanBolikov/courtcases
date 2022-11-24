@@ -39,7 +39,7 @@ import javafx.util.StringConverter;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
-@FxmlView("addcase.fxml")
+@FxmlView("editcase.fxml")
 public class EditCaseController {
 	private Stage stage;
 
@@ -235,6 +235,7 @@ public class EditCaseController {
 //			}
 //		});
 //		TODO: read StringPropertyValues from text inputs
+		stage.show();
 	}
 
 	private void setRestrictions(Relation relation) {
