@@ -34,7 +34,7 @@
             <Insets />
          </GridPane.margin>
          <children>
-            <Button fx:id="changeUser" mnemonicParsing="false" onAction="#changeUser" text="Сменить пользователя">
+            <Button fx:id="changeUser" mnemonicParsing="false" onAction="#changeUser" text="Другой пользователь">
                <font>
                   <Font name="Arial Unicode MS" size="14.0" />
                </font>

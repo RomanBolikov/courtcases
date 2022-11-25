@@ -5,27 +5,27 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 
-public class ConfirmationAlert extends Dialog<ButtonType> {
+public class CustomAlert extends Dialog<ButtonType> {
 
-	public ConfirmationAlert() {
+	public CustomAlert() {
 		this("", "", "");
 	}
 
-	public ConfirmationAlert(String title, @NamedArg("contentText") String contentText, String headerText,
+	public CustomAlert(String title, @NamedArg("contentText") String contentText, String headerText,
 			ButtonType... buttons) {
+		
 		super();
 
 		final DialogPane dialogPane = getDialogPane();
-		dialogPane.setContentText(contentText);
-		getDialogPane().getStyleClass().add("alert");
-
+		
+		dialogPane.setContentText(contentText);		
+			
 		for (ButtonType btnType : buttons) {
-			getDialogPane().getButtonTypes().setAll(btnType);
+			getDialogPane().getButtonTypes().addAll(btnType);
 		}
 
-		dialogPane.getStyleClass().add("confirmation");
-
 		setTitle(title);
+		
 		setHeaderText(headerText);
 	}
 }

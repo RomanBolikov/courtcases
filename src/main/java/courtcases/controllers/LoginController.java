@@ -1,11 +1,11 @@
 package courtcases.controllers;
 
-import java.util.List;
 import java.util.Optional;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import courtcases.StageReadyEvent;
+import courtcases.customGUI.CustomChoiceDialog;
 import courtcases.customGUI.PasswordInputDialog;
 import courtcases.data.Representative;
 import courtcases.data.RepresentativeRepo;
@@ -18,7 +18,6 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Alert.AlertType;
@@ -37,7 +36,7 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 
 	private Representative user;
 
-	private ChoiceDialog<Representative> choiceDialog;
+	private CustomChoiceDialog choiceDialog;
 
 	private Stage stage;
 
@@ -65,11 +64,8 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 
 	@FXML
 	private void chooseUser(ActionEvent actionEvent) {
-		List<Representative> reprList = reprRepo.findAll();
-		choiceDialog = new ChoiceDialog<Representative>(null, reprList);
+		choiceDialog = new CustomChoiceDialog(reprRepo);
 		DialogPane dp = choiceDialog.getDialogPane();
-		Button cancelButton = (Button) dp.lookupButton(ButtonType.CANCEL);
-		cancelButton.setText("Отмена");
 		Button okButton = (Button) dp.lookupButton(ButtonType.OK);
 		okButton.setOnAction(this::promptLogin);
 		choiceDialog.setTitle("Выбор пользователя");

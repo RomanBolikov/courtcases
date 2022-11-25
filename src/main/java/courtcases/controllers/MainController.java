@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Component;
 
-import courtcases.customGUI.ConfirmationAlert;
+import courtcases.customGUI.CustomAlert;
 import courtcases.data.ACase;
 import courtcases.data.CaseRepo;
 import courtcases.data.Representative;
@@ -205,7 +205,7 @@ public class MainController {
 		stage.setMaximized(false);
 		stage.setScene(new Scene(login.getView().get()));
 	}
-
+	
 	@FXML
 	private void editCase(ActionEvent actionEvent) {
 		fxWeaver.loadController(EditCaseController.class)
@@ -214,7 +214,7 @@ public class MainController {
 
 	@FXML
 	private void moveCaseToArchive(ActionEvent actionEvent) {
-		ButtonType confirmed = new ConfirmationAlert("Подтверждение", "Переместить дело в архив?", "", ButtonType.OK,
+		ButtonType confirmed = new CustomAlert("Подтверждение", "Переместить дело в архив?", "", ButtonType.OK,
 				ButtonType.CANCEL).showAndWait().get();
 		if (confirmed.getButtonData() != null) {
 			ACase acase = tableView.getSelectionModel().getSelectedItem();
@@ -226,7 +226,7 @@ public class MainController {
 
 	@FXML
 	private void restoreCaseFromArchive(ActionEvent actionEvent) {
-		ButtonType confirmed = new ConfirmationAlert("Подтверждение", "Восстановить дело из архива?", "", ButtonType.OK,
+		ButtonType confirmed = new CustomAlert("Подтверждение", "Восстановить дело из архива?", "", ButtonType.OK,
 				ButtonType.CANCEL).showAndWait().get();
 		if (confirmed.getButtonData() != null) {
 			ACase acase = tableView.getSelectionModel().getSelectedItem();

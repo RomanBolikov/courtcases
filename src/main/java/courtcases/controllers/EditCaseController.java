@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import courtcases.customGUI.ConfirmationAlert;
+import courtcases.customGUI.CustomAlert;
 import courtcases.data.ACase;
 import courtcases.data.CaseRepo;
 import courtcases.data.CaseTypeRepo;
@@ -23,6 +23,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextFormatter;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -83,20 +84,40 @@ public class EditCaseController extends FormController {
 				return new Court(string);
 			}
 		});
+		// set restrictions on inputs into hour and minute textfields
+		hourTextField.focusedProperty().addListener((obs, oldValue, newValue) -> {
+			if (!newValue) {
+				if (!hourTextField.getText().matches("[0-1][0-9]")) {
+					hourTextField.setText("");
+					new CustomAlert("Ошибка ввода", "", "Неверный ввод в поле \"часы\"", ButtonType.OK).show();
+				}
+			}
+		});
+
+		minuteTextField.focusedProperty().addListener((obs, oldValue, newValue) -> {
+			if (!newValue) {
+				if (!minuteTextField.getText().matches("[0-6][05]")) {
+					minuteTextField.setText("");
+					new CustomAlert("Ошибка ввода", "", "Неверный ввод в поле \"минуты\"", ButtonType.OK).show();
+				}
+			}
+		});
+			
+		// limit input into TextAreas to 300 characters
+		description.setTextFormatter(
+				new TextFormatter<String>(change -> change.getControlNewText().length() <= 300 ? change : null));
+		
+		currentState.setTextFormatter(
+				new TextFormatter<String>(change -> change.getControlNewText().length() <= 300 ? change : null));
 	}
 	
 	@Override
 	@FXML
 	public void saveCase(ActionEvent actionEvent) {
-		if (!isInputCorrect()) {
-			displayErrors();
-		} else {
+		if (isInputCorrect()) {
 			Court court = courtComboBox.getValue();
 			Optional<Court> courtInDB = courtRepo.findByName(court.getName());
-			if (courtInDB.isPresent())
-				court = courtInDB.get();
-			else
-				court = courtRepo.save(court);
+			court = courtInDB.isPresent() ? courtInDB.get() : courtRepo.save(court);
 			ACase newCase = new ACase(relationChoiceBox.getValue(), caseTypeChoiceBox.getValue(), description.getText(),
 					court, plaintiffTextField.getText(), defendantTextField.getText(), stageChoiceBox.getValue(),
 					currentState.getText());
@@ -116,9 +137,10 @@ public class EditCaseController extends FormController {
 				}
 			}
 			caseRepo.save(caseToEdit);
-			new ConfirmationAlert("Подтверждение", "", "Дело внесено в базу данных!", ButtonType.OK).show();
+			new CustomAlert("Подтверждение", "", "Дело внесено в базу данных!", ButtonType.OK).show();
 			stage.close();
-		}
+		} else 
+			displayErrors();
 	}
 
 //	***************************************************************************
@@ -178,16 +200,5 @@ public class EditCaseController extends FormController {
 //		});
 //		TODO: read StringPropertyValues from text inputs
 		stage.show();
-	}
-
-	private void setRestrictions(Relation relation) {
-		if (relation.getId() == 1)
-			plaintiffTextField.setDisable(true);
-		else if (relation.getId() == 2)
-			defendantTextField.setDisable(true);
-		else {
-			plaintiffTextField.setDisable(false);
-			defendantTextField.setDisable(false);
-		}
 	}
 }

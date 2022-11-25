@@ -8,13 +8,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import courtcases.customGUI.ConfirmationAlert;
+import courtcases.customGUI.CustomAlert;
 import courtcases.data.ACase;
 import courtcases.data.CaseRepo;
 import courtcases.data.CaseTypeRepo;
 import courtcases.data.Court;
 import courtcases.data.CourtRepo;
-import courtcases.data.Relation;
 import courtcases.data.RelationRepo;
 import courtcases.data.Representative;
 import courtcases.data.RepresentativeRepo;
@@ -25,6 +24,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextFormatter;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -84,8 +84,34 @@ public class AddCaseController extends FormController {
 				return new Court(string);
 			}
 		});
+		
+		// set restrictions on inputs into hour and minute textfields
+		hourTextField.focusedProperty().addListener((obs, oldValue, newValue) -> {
+			if (!newValue) {
+				if (!hourTextField.getText().matches("[0-1][0-9]")) {
+					hourTextField.setText("");
+					new CustomAlert("Ошибка ввода", "", "Неверный ввод в поле \"часы\"", ButtonType.OK).show();
+				}
+			}
+		});
+
+		minuteTextField.focusedProperty().addListener((obs, oldValue, newValue) -> {
+			if (!newValue) {
+				if (!minuteTextField.getText().matches("[0-6][05]")) {
+					minuteTextField.setText("");
+					new CustomAlert("Ошибка ввода", "", "Неверный ввод в поле \"минуты\"", ButtonType.OK).show();
+				}
+			}
+		});
+		
+		// limit input into TextAreas to 300 characters
+		description.setTextFormatter(
+				new TextFormatter<String>(change -> change.getControlNewText().length() <= 300 ? change : null));
+		
+		currentState.setTextFormatter(
+				new TextFormatter<String>(change -> change.getControlNewText().length() <= 300 ? change : null));
 	}
-	
+
 	@Override
 	@FXML
 	public void saveCase(ActionEvent actionEvent) {
@@ -105,20 +131,20 @@ public class AddCaseController extends FormController {
 				newCase.setCase_no(caseNoTextField.getText());
 			if (representativeChoiceBox.getValue() != null)
 				newCase.setRepr(representativeChoiceBox.getValue());
-			if (currDatePicker.getValue() != null && hourTextField.getText() != "" && minuteTextField.getText() != "") {
+			if (currDatePicker.getValue() != null) {
 				try {
-					int hours = Integer.parseInt(hourTextField.getText());
-					int mins = Integer.parseInt(minuteTextField.getText());
+					int hours = Integer.parseInt(hourTextField.getText(), 10); 
+					int mins = Integer.parseInt(minuteTextField.getText(), 10);
 					LocalDate date = currDatePicker.getValue();
 					LocalTime time = LocalTime.of(hours, mins);
 					newCase.setCurr_date(Timestamp.valueOf(LocalDateTime.of(date, time)));
-				} catch (NumberFormatException e) {
+				} catch (NumberFormatException nfe) {
 					newCase.setCurr_date(null);
-				}
+				}	
 			}
 			newCase = caseRepo.save(newCase);
 			caseList.addAll(newCase);
-			new ConfirmationAlert("Подтверждение", "", "Дело внесено в базу данных!", ButtonType.OK).show();
+			new CustomAlert("Подтверждение", "", "Дело внесено в базу данных!", ButtonType.OK).show();
 			stage.close();
 		}
 	}
@@ -131,22 +157,5 @@ public class AddCaseController extends FormController {
 		if (!user.isAdmin())
 			representativeChoiceBox.setDisable(true);
 		stage.show();
-	}
-
-	private void setRestrictions(Relation relation) {
-		if (relation.getId() == 1) {
-			plaintiffTextField.setText("Минстрой края");
-			plaintiffTextField.setDisable(true);
-			defendantTextField.setDisable(false);
-			defendantTextField.setText("");
-		} else if (relation.getId() == 2) {
-			plaintiffTextField.setDisable(false);
-			plaintiffTextField.setText("");
-			defendantTextField.setText("Минстрой края");
-			defendantTextField.setDisable(true);
-		} else {
-			plaintiffTextField.setDisable(false);
-			defendantTextField.setDisable(false);
-		}
 	}
 }

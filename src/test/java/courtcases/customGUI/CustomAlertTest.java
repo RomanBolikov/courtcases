@@ -2,11 +2,11 @@ package courtcases.customGUI;
 
 import org.junit.jupiter.api.Test;
 
-class ConfirmationAlertTest {
+class CustomAlertTest {
 
 	@Test
 	void test() {
-		new ConfirmationAlert().show();
+		new CustomAlert().show();
 	}
 
 }

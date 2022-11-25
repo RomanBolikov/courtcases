@@ -1,13 +1,12 @@
 package courtcases.controllers;
 
+import courtcases.customGUI.CustomAlert;
 import courtcases.data.CaseType;
 import courtcases.data.Court;
 import courtcases.data.Relation;
 import courtcases.data.Representative;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
@@ -80,7 +79,21 @@ public abstract class FormController {
 	
 
 //	***************************************************************************
-
+	
+	protected void setRestrictions(Relation relation) {
+		if (relation.getId() == 1) {
+			plaintiffTextField.setText("Минстрой края");
+			plaintiffTextField.setDisable(true);
+			defendantTextField.setDisable(false);
+		} else if (relation.getId() == 2) {
+			plaintiffTextField.setDisable(false);
+			defendantTextField.setText("Минстрой края");
+			defendantTextField.setDisable(true);
+		} else {
+			plaintiffTextField.setDisable(false);
+			defendantTextField.setDisable(false);
+		}
+	}
 
 	protected boolean isInputCorrect() {
 		return relationChoiceBox.getValue() != null && caseTypeChoiceBox.getValue() != null
@@ -90,6 +103,6 @@ public abstract class FormController {
 	}
 
 	protected void displayErrors() {
-		new Alert(AlertType.ERROR, "Проверьте заполнение полей!", ButtonType.OK).show();
+		new CustomAlert("Ошибка ввода", "", "Проверьте заполнение полей!", ButtonType.OK).show();
 	}
 }
