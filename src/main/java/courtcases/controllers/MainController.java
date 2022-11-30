@@ -3,6 +3,7 @@ package courtcases.controllers;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
@@ -15,10 +16,12 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -31,6 +34,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -157,7 +162,7 @@ public class MainController {
 							setStyle("");
 						} else if (item.equals("не назначено"))
 							setTextFill(Color.RED);
-						else if (!item.equals("")) {
+						else if (!item.isEmpty()) {
 							DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 							LocalDateTime datetime = LocalDateTime.parse(item, formatter);
 							setTextFill(datetime.isBefore(LocalDateTime.now()) ? Color.RED : Color.BLACK);
@@ -171,19 +176,26 @@ public class MainController {
 				return cell;
 			};
 		});
-		// setting rows displayed in green for archived cases
-		tableView.setRowFactory(tv -> new TableRow<ACase>() {
-			@Override
-			protected void updateItem(ACase item, boolean empty) {
-				super.updateItem(item, empty);
-				if (empty || item == null)
-					setStyle("");
-				else {
-					for (int i = 0; i < getChildren().size() - 1; i++) {
-						((Labeled) getChildren().get(i)).setTextFill(item.isArchive() ? Color.GREEN : Color.BLACK);
+		// setting rows displayed in green for archived cases and make rows editable by double-clicking
+		tableView.setRowFactory(tv -> {
+			TableRow<ACase> row = new TableRow<ACase>() {
+				@Override
+				protected void updateItem(ACase item, boolean empty) {
+					super.updateItem(item, empty);
+					if (empty || item == null)
+						setStyle("");
+					else {
+						for (int i = 0; i < getChildren().size() - 1; i++) {
+							((Labeled) getChildren().get(i)).setTextFill(item.isArchive() ? Color.GREEN : Color.BLACK);
+						}
 					}
 				}
-			}
+			};
+			row.setOnMouseClicked(evt -> {
+				if (evt.getButton().equals(MouseButton.PRIMARY) && evt.getClickCount() == 2)
+			        	editCase(new ActionEvent());	
+				});
+			return row;
 		});
 		myCases.setUserData("myCases");
 		allCases.setUserData("allCases");
@@ -205,7 +217,7 @@ public class MainController {
 		stage.setMaximized(false);
 		stage.setScene(new Scene(login.getView().get()));
 	}
-	
+
 	@FXML
 	private void editCase(ActionEvent actionEvent) {
 		fxWeaver.loadController(EditCaseController.class)
@@ -214,9 +226,9 @@ public class MainController {
 
 	@FXML
 	private void moveCaseToArchive(ActionEvent actionEvent) {
-		ButtonType confirmed = new CustomAlert("Подтверждение", "Переместить дело в архив?", "", ButtonType.OK,
-				ButtonType.CANCEL).showAndWait().get();
-		if (confirmed.getButtonData() != null) {
+		Optional<ButtonType> confirmed = new CustomAlert("Подтверждение", "Переместить дело в архив?", "",
+				ButtonType.OK, new ButtonType("Отмена", ButtonData.CANCEL_CLOSE)).showAndWait();
+		if (confirmed.isPresent() && confirmed.get() == ButtonType.OK) {
 			ACase acase = tableView.getSelectionModel().getSelectedItem();
 			acase.setIsArchive(true);
 			acase.setCurr_date(null);
@@ -226,9 +238,9 @@ public class MainController {
 
 	@FXML
 	private void restoreCaseFromArchive(ActionEvent actionEvent) {
-		ButtonType confirmed = new CustomAlert("Подтверждение", "Восстановить дело из архива?", "", ButtonType.OK,
-				ButtonType.CANCEL).showAndWait().get();
-		if (confirmed.getButtonData() != null) {
+		Optional<ButtonType> confirmed = new CustomAlert("Подтверждение", "Восстановить дело из архива?", "",
+				ButtonType.OK, new ButtonType("Отмена", ButtonData.CANCEL_CLOSE)).showAndWait();
+		if (confirmed.isPresent() && confirmed.get() == ButtonType.OK) {
 			ACase acase = tableView.getSelectionModel().getSelectedItem();
 			acase.setIsArchive(false);
 			caseRepo.save(acase);

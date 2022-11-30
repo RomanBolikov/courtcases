@@ -97,9 +97,9 @@ public abstract class FormController {
 
 	protected boolean isInputCorrect() {
 		return relationChoiceBox.getValue() != null && caseTypeChoiceBox.getValue() != null
-				&& description.getText() != null && courtComboBox.getValue() != null
-				&& plaintiffTextField.getText() != "" && defendantTextField.getText() != ""
-				&& stageChoiceBox.getValue() != null && currentState.getText() != "";
+				&& !description.getText().isEmpty() && courtComboBox.getValue() != null
+				&& !plaintiffTextField.getText().isEmpty() && !defendantTextField.getText().isEmpty()
+				&& stageChoiceBox.getValue() != null && !currentState.getText().isEmpty();
 	}
 
 	protected void displayErrors() {

@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import courtcases.StageReadyEvent;
+import courtcases.customGUI.CustomAlert;
 import courtcases.customGUI.CustomChoiceDialog;
 import courtcases.customGUI.PasswordInputDialog;
 import courtcases.data.Representative;
@@ -14,13 +15,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
-import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxControllerAndView;
 import net.rgielen.fxweaver.core.FxWeaver;
@@ -73,6 +72,16 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 		choiceDialog.show();
 	}
 
+	@FXML
+	private void loginAsAdmin(ActionEvent actionEvent) {
+		// TODO
+	}
+
+	@FXML
+	private void quit(ActionEvent actionEvent) {
+		Platform.exit();
+	}
+
 	private void promptLogin(ActionEvent actionEvent) {
 		this.user = choiceDialog.getSelectedItem();
 		if (!this.user.isAdmin())
@@ -92,34 +101,24 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 	private void displayPrompt(Representative user) {
 		Dialog<String> prompt = new PasswordInputDialog();
 		prompt.setHeaderText("Ввведите пароль");
-		Optional<String> input = prompt.showAndWait();
-		Alert alert;
-		if (input.isPresent()) {
-			if (BCrypt.checkpw(input.get(), user.getPassword()))
-				loadMainController();
-			else {
-				alert = new Alert(AlertType.ERROR, "Пароль неверный!", new ButtonType("Повторить", ButtonData.OK_DONE),
-						new ButtonType("Закрыть", ButtonData.CANCEL_CLOSE));
-				alert.setHeaderText("");
-				alert.setGraphic(null);
-				ButtonData res = alert.showAndWait().get().getButtonData();
-				if (res == ButtonData.OK_DONE)
-					displayPrompt(user);
-			}
+		CustomAlert alert = new CustomAlert("Ошибка ввода", "Введен неверный пароль!", "",
+				new ButtonType("Повторить", ButtonData.OK_DONE), new ButtonType("Закрыть", ButtonData.CANCEL_CLOSE));
+		while (true) {
+			Optional<String> input = prompt.showAndWait();
+			if (input.isPresent()) {
+				if (BCrypt.checkpw(input.get(), user.getPassword())) {
+					loadMainController();
+					break;
+				} else {
+					Optional<ButtonType> retry = alert.showAndWait();
+					if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE)
+						break;
+				}
+			} else break;
 		}
 	}
 
 	public Stage getStage() {
 		return stage;
-	}
-
-	@FXML
-	private void loginAsAdmin(ActionEvent actionEvent) {
-		// TODO
-	}
-
-	@FXML
-	private void quit(ActionEvent actionEvent) {
-		Platform.exit();
 	}
 }

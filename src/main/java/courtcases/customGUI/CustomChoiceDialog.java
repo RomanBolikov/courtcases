@@ -126,19 +126,24 @@ public class CustomChoiceDialog extends Dialog<Representative> {
 		Representative user = getSelectedItem();
 		Dialog<String> prompt = new PasswordChangeDialog(user.getPassword());
 		prompt.setHeaderText("Введите пароль");
-		Optional<String> newPassword = prompt.showAndWait();
-		if (newPassword.isPresent() && newPassword != null) {
-			String pswHash = BCrypt.hashpw(newPassword.get(), BCrypt.gensalt());
-			user.setPassword(pswHash);
-			reprRepo.save(user);
-			new CustomAlert("Подтверждение", "", "Пароль успешно изменен!", ButtonType.OK).show();
-		} else {
-			CustomAlert alert = new CustomAlert("Ошибка", "", "Неверный ввод!",
-					new ButtonType("Повторить", ButtonData.OK_DONE),
-					new ButtonType("Закрыть", ButtonData.CANCEL_CLOSE));
-			ButtonData res = alert.showAndWait().get().getButtonData();
-			if (res == ButtonData.OK_DONE)
-				changePassword();
+		CustomAlert alert = new CustomAlert("Ошибка", "", "Неверный ввод!",
+				new ButtonType("Повторить", ButtonData.OK_DONE),
+				new ButtonType("Закрыть", ButtonData.CANCEL_CLOSE));
+		while (true) {
+			Optional<String> newPassword = prompt.showAndWait();
+			if (newPassword.isPresent()) {
+				if (!newPassword.get().equals("invalid")) {
+					String pswHash = BCrypt.hashpw(newPassword.get(), BCrypt.gensalt(4));
+					user.setPassword(pswHash);
+					reprRepo.save(user);
+					new CustomAlert("Подтверждение", "", "Пароль успешно изменен!", ButtonType.OK).show();
+					break;
+				} else {
+					Optional<ButtonType> retry = alert.showAndWait();
+					if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE)
+						break;
+				} 
+			} else break;
 		}
 	}
 }

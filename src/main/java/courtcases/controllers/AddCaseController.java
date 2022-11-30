@@ -1,9 +1,5 @@
 package courtcases.controllers;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -14,6 +10,7 @@ import courtcases.data.CaseRepo;
 import courtcases.data.CaseTypeRepo;
 import courtcases.data.Court;
 import courtcases.data.CourtRepo;
+import courtcases.data.DatePickerConverter;
 import courtcases.data.RelationRepo;
 import courtcases.data.Representative;
 import courtcases.data.RepresentativeRepo;
@@ -84,7 +81,7 @@ public class AddCaseController extends FormController {
 				return new Court(string);
 			}
 		});
-		
+
 		// set restrictions on inputs into hour and minute textfields
 		hourTextField.focusedProperty().addListener((obs, oldValue, newValue) -> {
 			if (!newValue) {
@@ -103,11 +100,17 @@ public class AddCaseController extends FormController {
 				}
 			}
 		});
+		// limit input into plaintiff anf defendant TextFields to 200 characters
+		plaintiffTextField.setTextFormatter(
+				new TextFormatter<String>(change -> change.getControlNewText().length() <= 200 ? change : null));
+
+		defendantTextField.setTextFormatter(
+				new TextFormatter<String>(change -> change.getControlNewText().length() <= 200 ? change : null));
 		
 		// limit input into TextAreas to 300 characters
 		description.setTextFormatter(
 				new TextFormatter<String>(change -> change.getControlNewText().length() <= 300 ? change : null));
-		
+
 		currentState.setTextFormatter(
 				new TextFormatter<String>(change -> change.getControlNewText().length() <= 300 ? change : null));
 	}
@@ -127,20 +130,20 @@ public class AddCaseController extends FormController {
 			ACase newCase = new ACase(relationChoiceBox.getValue(), caseTypeChoiceBox.getValue(), description.getText(),
 					court, plaintiffTextField.getText(), defendantTextField.getText(), stageChoiceBox.getValue(),
 					currentState.getText());
-			if (caseNoTextField.getText() != "")
+			if (!caseNoTextField.getText().isEmpty())
 				newCase.setCase_no(caseNoTextField.getText());
 			if (representativeChoiceBox.getValue() != null)
 				newCase.setRepr(representativeChoiceBox.getValue());
-			if (currDatePicker.getValue() != null) {
+			if (currDatePicker.getValue() != null && !hourTextField.getText().isEmpty()
+					&& !minuteTextField.getText().isEmpty()) {
 				try {
-					int hours = Integer.parseInt(hourTextField.getText(), 10); 
+					int hours = Integer.parseInt(hourTextField.getText(), 10);
 					int mins = Integer.parseInt(minuteTextField.getText(), 10);
-					LocalDate date = currDatePicker.getValue();
-					LocalTime time = LocalTime.of(hours, mins);
-					newCase.setCurr_date(Timestamp.valueOf(LocalDateTime.of(date, time)));
+					newCase.setCurr_date(
+							DatePickerConverter.convertToTimestamp(currDatePicker.getValue(), hours, mins));
 				} catch (NumberFormatException nfe) {
 					newCase.setCurr_date(null);
-				}	
+				}
 			}
 			newCase = caseRepo.save(newCase);
 			caseList.addAll(newCase);
