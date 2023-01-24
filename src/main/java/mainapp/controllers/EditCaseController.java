@@ -18,46 +18,27 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import mainapp.customGUI.CustomAlert;
 import mainapp.data.ACase;
-import mainapp.data.CaseRepo;
-import mainapp.data.CaseTypeRepo;
 import mainapp.data.Court;
 import mainapp.data.CourtRepo;
+import mainapp.data.DataModel;
 import mainapp.data.DatePickerConverter;
 import mainapp.data.Relation;
-import mainapp.data.RelationRepo;
-import mainapp.data.RepresentativeRepo;
-import mainapp.data.StageRepo;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
 @FxmlView("editcase.fxml")
 public class EditCaseController extends AbstractCaseController {
+	
 	private Stage stage;
 
 	private MainController parent;
 
 	private ACase caseToEdit;
+	
+	private final DataModel model;
 
-	private final CaseRepo caseRepo;
-
-	private final RepresentativeRepo reprRepo;
-
-	private final CaseTypeRepo caseTypeRepo;
-
-	private final RelationRepo relationRepo;
-
-	private final StageRepo stageRepo;
-
-	private final CourtRepo courtRepo;
-
-	public EditCaseController(CaseRepo caseRepo, RepresentativeRepo reprRepo, CaseTypeRepo caseTypeRepo,
-			RelationRepo relationRepo, StageRepo stageRepo, CourtRepo courtRepo) {
-		this.caseRepo = caseRepo;
-		this.reprRepo = reprRepo;
-		this.caseTypeRepo = caseTypeRepo;
-		this.relationRepo = relationRepo;
-		this.stageRepo = stageRepo;
-		this.courtRepo = courtRepo;
+	public EditCaseController(DataModel model) {
+		this.model = model;
 	}
 
 // 	FXML-annotated methods
@@ -69,11 +50,11 @@ public class EditCaseController extends AbstractCaseController {
 		stage.setTitle("Редактирование дела");
 		stage.setResizable(false);
 		stage.setScene(new Scene(gridPane));
-		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(caseTypeRepo.findAll()));
-		relationChoiceBox.setItems(FXCollections.observableArrayList(relationRepo.findAll()));
-		representativeChoiceBox.setItems(FXCollections.observableArrayList(reprRepo.findAll()));
-		stageChoiceBox.setItems(FXCollections.observableArrayList(stageRepo.findAll()));
-		courtComboBox.setItems(FXCollections.observableArrayList(courtRepo.findAll()));
+		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(model.getCaseTypeRepo().findAll()));
+		relationChoiceBox.setItems(FXCollections.observableArrayList(model.getRelationRepo().findAll()));
+		representativeChoiceBox.setItems(FXCollections.observableArrayList(model.getReprRepo().findAll()));
+		stageChoiceBox.setItems(FXCollections.observableArrayList(model.getStageRepo().findAll()));
+		courtComboBox.setItems(FXCollections.observableArrayList(model.getCourtRepo().findAll()));
 		courtComboBox.setConverter(new StringConverter<Court>() {
 			@Override
 			public String toString(Court court) {
@@ -122,6 +103,7 @@ public class EditCaseController extends AbstractCaseController {
 			return;
 		}
 		Court court = courtComboBox.getValue(); // what was specified by user
+		CourtRepo courtRepo = model.getCourtRepo();
 		Optional<Court> courtInDB = courtRepo.findByName(court.getName()); // try to lookup court in database
 		if (!courtInDB.isPresent()) { // if the court is not in DB then it's saved to it and set as case property
 			court = courtRepo.save(court);
@@ -133,7 +115,7 @@ public class EditCaseController extends AbstractCaseController {
 			caseToEdit.setCase_no(caseNoTextField.getText());
 		String repr = representativeChoiceBox.getValue().getName();
 		if (!repr.equals(caseToEdit.getRepr().getName()))
-			caseToEdit.setRepr(reprRepo.findByName(repr));
+			caseToEdit.setRepr(model.getReprRepo().findByName(repr));
 		if (currDatePicker.getValue() != null && !hourTextField.getText().isEmpty()
 				&& !minuteTextField.getText().isEmpty()) {
 			try {
@@ -156,14 +138,13 @@ public class EditCaseController extends AbstractCaseController {
 		if (!currentState.getText().equals(caseToEdit.getCurr_state()))
 			caseToEdit.setCurr_state(currentState.getText());
 		try {
-			caseToEdit = caseRepo.save(caseToEdit);
+			caseToEdit = model.getCaseRepo().save(caseToEdit);
 			new CustomAlert("Подтверждение", "", "Дело внесено в базу данных!", ButtonType.OK).show();
-			parent.refreshTable();
 		} catch (OptimisticLockException ole) {
 			new CustomAlert("Обновление данных", "", "Параметры дела изменены другим пользователем!", ButtonType.OK)
 					.show();
-			parent.refreshTable();
 		} finally {
+			parent.refreshTable();
 			stage.close();
 		}
 	}
@@ -205,11 +186,11 @@ public class EditCaseController extends AbstractCaseController {
 		stageChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setStage(newVal));
 		courtComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
 			Court court = newVal;
-			Optional<Court> courtInDB = courtRepo.findByName(court.getName());
+			Optional<Court> courtInDB = model.getCourtRepo().findByName(court.getName());
 			if (courtInDB.isPresent())
 				court = courtInDB.get();
 			else
-				court = courtRepo.save(court);
+				court = model.getCourtRepo().save(court);
 			caseToEdit.setCourt(court);
 		});
 		currDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> {

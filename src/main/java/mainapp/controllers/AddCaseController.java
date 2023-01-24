@@ -15,44 +15,24 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import mainapp.customGUI.CustomAlert;
 import mainapp.data.ACase;
-import mainapp.data.CaseRepo;
-import mainapp.data.CaseTypeRepo;
 import mainapp.data.Court;
-import mainapp.data.CourtRepo;
+import mainapp.data.DataModel;
 import mainapp.data.DatePickerConverter;
-import mainapp.data.RelationRepo;
 import mainapp.data.Representative;
-import mainapp.data.RepresentativeRepo;
-import mainapp.data.StageRepo;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
 @FxmlView("addcase.fxml")
 public class AddCaseController extends AbstractCaseController {
+	
 	private Stage stage;
 
 	private ObservableList<ACase> caseList;
 
-	private final CaseRepo caseRepo;
+	private final DataModel model;
 
-	private final RepresentativeRepo reprRepo;
-
-	private final CaseTypeRepo caseTypeRepo;
-
-	private final RelationRepo relationRepo;
-
-	private final StageRepo stageRepo;
-
-	private final CourtRepo courtRepo;
-
-	public AddCaseController(CaseRepo caseRepo, RepresentativeRepo reprRepo, CaseTypeRepo caseTypeRepo,
-			RelationRepo relationRepo, StageRepo stageRepo, CourtRepo courtRepo) {
-		this.caseRepo = caseRepo;
-		this.reprRepo = reprRepo;
-		this.caseTypeRepo = caseTypeRepo;
-		this.relationRepo = relationRepo;
-		this.stageRepo = stageRepo;
-		this.courtRepo = courtRepo;
+	public AddCaseController(DataModel model) {
+		this.model = model;
 	}
 
 	@Override
@@ -62,12 +42,12 @@ public class AddCaseController extends AbstractCaseController {
 		stage.setTitle("Добавление нового дела");
 		stage.setResizable(false);
 		stage.setScene(new Scene(gridPane));
-		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(caseTypeRepo.findAll()));
-		relationChoiceBox.setItems(FXCollections.observableArrayList(relationRepo.findAll()));
+		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(model.getCaseTypeRepo().findAll()));
+		relationChoiceBox.setItems(FXCollections.observableArrayList(model.getRelationRepo().findAll()));
 		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> setRestrictions(newVal));
-		representativeChoiceBox.setItems(FXCollections.observableArrayList(reprRepo.findAll()));
-		stageChoiceBox.setItems(FXCollections.observableArrayList(stageRepo.findAll()));
-		courtComboBox.setItems(FXCollections.observableArrayList(courtRepo.findAll()));
+		representativeChoiceBox.setItems(FXCollections.observableArrayList(model.getReprRepo().findAll()));
+		stageChoiceBox.setItems(FXCollections.observableArrayList(model.getStageRepo().findAll()));
+		courtComboBox.setItems(FXCollections.observableArrayList(model.getCourtRepo().findAll()));
 		courtComboBox.setConverter(new StringConverter<Court>() {
 			@Override
 			public String toString(Court court) {
@@ -122,11 +102,11 @@ public class AddCaseController extends AbstractCaseController {
 			displayErrors();
 		} else {
 			Court court = courtComboBox.getValue();
-			Optional<Court> courtInDB = courtRepo.findByName(court.getName());
+			Optional<Court> courtInDB = model.getCourtRepo().findByName(court.getName());
 			if (courtInDB.isPresent())
 				court = courtInDB.get();
 			else
-				court = courtRepo.save(court);
+				court = model.getCourtRepo().save(court);
 			ACase newCase = new ACase(relationChoiceBox.getValue(), caseTypeChoiceBox.getValue(), description.getText(),
 					court, plaintiffTextField.getText(), defendantTextField.getText(), stageChoiceBox.getValue(),
 					currentState.getText());
@@ -145,7 +125,7 @@ public class AddCaseController extends AbstractCaseController {
 					newCase.setCurr_date(null);
 				}
 			}
-			newCase = caseRepo.save(newCase);
+			newCase = model.getCaseRepo().save(newCase);
 			caseList.addAll(newCase);
 			new CustomAlert("Подтверждение", "", "Дело внесено в базу данных!", ButtonType.OK).show();
 			stage.close();

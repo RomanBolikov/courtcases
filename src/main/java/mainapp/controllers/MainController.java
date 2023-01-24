@@ -23,12 +23,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -38,16 +36,17 @@ import javafx.util.Callback;
 import mainapp.customGUI.CustomAlert;
 import mainapp.data.ACase;
 import mainapp.data.CaseRepo;
+import mainapp.data.DataModel;
 import mainapp.data.Representative;
 import net.rgielen.fxweaver.core.FxControllerAndView;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
-@FxmlView("main.fxml")
+@FxmlView("main1.fxml")
 public class MainController {
 
-	private CaseRepo caseRepo;
+	private final CaseRepo caseRepo;
 
 	private ObservableList<ACase> caseList;
 
@@ -61,14 +60,17 @@ public class MainController {
 	private final Image removeIcon = new Image(
 			this.getClass().getResource("/mainapp/images/remove.png").toExternalForm());
 
-	public MainController(CaseRepo caseRepo, FxWeaver fxWeaver) {
-		this.caseRepo = caseRepo;
-		this.caseList = FXCollections.observableArrayList(caseRepo.findAll());
+	public MainController(DataModel model, FxWeaver fxWeaver) {
+		this.caseRepo = model.getCaseRepo();
+		this.caseList = FXCollections.observableArrayList(model.getCaseRepo().findAll());
 		this.fxWeaver = fxWeaver;
 	}
 
 // 	FXML GUI elements
 
+	@FXML
+	private Label filterLabel;
+	
 	@FXML
 	private Label userLabel;
 
@@ -112,21 +114,18 @@ public class MainController {
 	private ImageView archiveIcon;
 
 	@FXML
-	private CheckBox archiveCases;
-
+	private Button applyFilterButton;
+	
 	@FXML
-	private RadioButton myCases;
-
+	private Button dropFilterButton;
+	
 	@FXML
-	private RadioButton allCases;
-
-	@FXML
-	private ToggleGroup toggleGroup;
+	private CheckBox archiveCheckbox;
 	
 	@FXML
 	private Button refreshButton;
-	
 
+	
 //  *********************************************
 
 // 	FXML-annotated methods
@@ -152,7 +151,7 @@ public class MainController {
 			}
 			return property;
 		});
-		// setting cells displayed in red if no date or date is expired
+		// setting cells displayed in red if date not appointed or is expired
 		dateColumn.setCellFactory(new Callback<TableColumn<ACase, String>, TableCell<ACase, String>>() {
 			@Override
 			public TableCell<ACase, String> call(TableColumn<ACase, String> param) {
@@ -201,15 +200,15 @@ public class MainController {
 				});
 			return row;
 		});
-		myCases.setUserData("myCases");
-		allCases.setUserData("allCases");
-		toggleGroup.selectedToggleProperty()
-				.addListener((obs, o, n) -> tableView.setItems(caseList.filtered(this::filterPredicate)));
-		archiveCases.setOnAction(e -> tableView.setItems(caseList.filtered(this::filterPredicate)));
 		tableView.getSelectionModel().selectedItemProperty().addListener(this::enableEditButton);
-		refreshButton.setOnAction(e -> tableView.refresh());
 	}
 
+	@FXML
+	private void applyFilters(ActionEvent actionEvent) {
+		FilterController filterController = fxWeaver.loadController(FilterController.class);
+		filterController.setParent(this);
+	}
+	
 	@FXML
 	private void addCase(ActionEvent actionEvent) {
 		fxWeaver.loadController(AddCaseController.class).show(caseList, user);
@@ -245,7 +244,7 @@ public class MainController {
 				.show();
 			} finally {
 				refreshTable();
-				tableView.setItems(caseList.filtered(this::filterPredicate));
+//				tableView.setItems(caseList.filtered(this::filterPredicate));
 			}
 		}
 	}
@@ -273,7 +272,6 @@ public class MainController {
 	public void displayUser(Representative user) {
 		this.user = user;
 		userLabel.setText("Пользователь: " + this.user);
-		tableView.setItems(caseList.filtered(this::filterPredicate));
 		if (!user.isAdmin()) {
 			archiveButton.setDisable(true);
 			tableView.getSelectionModel().selectedItemProperty().removeListener(this::modifyArchiveButton);
@@ -312,24 +310,14 @@ public class MainController {
 			editCaseButton.setDisable(false);
 	}
 
-	/**
-	 * this filter defines which cases are displayed in the TableView
-	 * 'allCases' is a user filter that defines whether only user-specific or all cases should be displayed
-	 * 'includeArchiveCases' is a filter that defines whether archived cases should be included
-	 * initially user filter is set to 'true' (meaning all cases are displayed), however because the default
-	 * value for the correspondent ToggleGroup is 'myCases', in effect only the latter are displayed on loading
-	 * archive filter is initially set to filter out archived cases
-	 * @param acase - a case that is to be filtered
-	 * @return a logical AND of user and archive filters
-	 */
-	private boolean filterPredicate(ACase acase) {
-		boolean allCases = true, includeArchiveCases = !acase.isArchive();
-		if ((String) toggleGroup.getSelectedToggle().getUserData() == "myCases")
-			allCases = acase.getRepr().toString().equals(user.toString());
-		if (archiveCases.isSelected())
-			includeArchiveCases = true;
-		return allCases && includeArchiveCases;
-	}
+//	private boolean filterPredicate(ACase acase) {
+//		boolean allCases = true, includeArchiveCases = !acase.isArchive();
+//		if ((String) toggleGroup.getSelectedToggle().getUserData() == "myCases")
+//			allCases = acase.getRepr().toString().equals(user.toString());
+//		if (archiveCases.isSelected())
+//			includeArchiveCases = true;
+//		return allCases && includeArchiveCases;
+//	}
 	
 	public void refreshTable() {
 		tableView.refresh();

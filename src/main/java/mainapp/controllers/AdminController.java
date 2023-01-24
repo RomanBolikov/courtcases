@@ -33,6 +33,7 @@ import mainapp.customGUI.CustomAlert;
 import mainapp.customGUI.PasswordSetDialog;
 import mainapp.data.ACase;
 import mainapp.data.CaseRepo;
+import mainapp.data.DataModel;
 import mainapp.data.Representative;
 import mainapp.data.RepresentativeRepo;
 import net.rgielen.fxweaver.core.FxControllerAndView;
@@ -51,9 +52,9 @@ public class AdminController {
 
 	private FxWeaver fxWeaver;
 
-	public AdminController(CaseRepo caseRepo, RepresentativeRepo reprRepo, FxWeaver fxWeaver) {
-		this.caseRepo = caseRepo;
-		this.reprRepo = reprRepo;
+	public AdminController(DataModel model, FxWeaver fxWeaver) {
+		this.caseRepo = model.getCaseRepo();
+		this.reprRepo = model.getReprRepo();
 		this.reprList = FXCollections.observableArrayList(reprRepo.findAll());
 		this.fxWeaver = fxWeaver;
 	}

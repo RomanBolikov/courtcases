@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<GridPane fx:id="gridPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="336.0" prefWidth="525.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mainapp.controllers.FilterController">
+  <columnConstraints>
+    <ColumnConstraints maxWidth="159.99999392032623" minWidth="5.6000062227249146" prefWidth="121.59997713565826" />
+    <ColumnConstraints maxWidth="232.39999377727509" minWidth="78.00000607967377" prefWidth="116.40002286434174" />
+      <ColumnConstraints />
+      <ColumnConstraints />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints maxHeight="146.40000915527344" minHeight="7.199999809265137" prefHeight="78.59999008178711" vgrow="NEVER" />
+    <RowConstraints maxHeight="226.40000019073486" minHeight="10.0" prefHeight="87.99998779296875" valignment="TOP" vgrow="NEVER" />
+      <RowConstraints maxHeight="226.40000019073486" minHeight="10.0" prefHeight="52.79999389648438" valignment="TOP" vgrow="NEVER" />
+      <RowConstraints maxHeight="226.40000019073486" minHeight="10.0" prefHeight="52.79999389648438" valignment="TOP" vgrow="NEVER" />
+      <RowConstraints maxHeight="238.5999816894531" minHeight="10.0" prefHeight="129.80000610351559" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <HBox GridPane.columnSpan="4">
+         <children>
+            <VBox spacing="10.0">
+               <children>
+                  <Label prefHeight="20.0" prefWidth="124.0" text="Раздел таблицы:">
+                     <font>
+                        <Font name="Arial Unicode MS" size="14.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox fx:id="relationChoiceBox" prefWidth="150.0" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="20.0" />
+               </padding>
+            </VBox>
+            <VBox spacing="10.0">
+               <children>
+                  <Label prefHeight="20.0" prefWidth="124.0" text="Вид дела:">
+                     <font>
+                        <Font name="Arial Unicode MS" size="14.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox fx:id="caseTypeChoiceBox" prefWidth="150.0" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="20.0" />
+               </padding>
+            </VBox>
+            <VBox spacing="10.0">
+               <children>
+                  <Label prefHeight="20.0" prefWidth="124.0" text="Представитель:">
+                     <font>
+                        <Font name="Arial Unicode MS" size="14.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox fx:id="representativeChoiceBox" prefWidth="150.0" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="20.0" />
+               </padding>
+            </VBox>
+         </children>
+      </HBox>
+      <VBox spacing="10.0" GridPane.columnSpan="2" GridPane.rowIndex="1">
+         <children>
+            <Label prefHeight="20.0" prefWidth="124.0" text="Суд:">
+               <font>
+                  <Font name="Arial Unicode MS" size="14.0" />
+               </font>
+            </Label>
+            <ComboBox fx:id="courtComboBox" editable="true" prefWidth="220.0" promptText="начните ввод" />
+            <Label layoutX="20.0" layoutY="30.0" prefHeight="20.0" prefWidth="124.0" text="Истец (заявитель):">
+               <font>
+                  <Font name="Arial Unicode MS" size="14.0" />
+               </font>
+            </Label>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="20.0" />
+         </padding>
+      </VBox>
+      <VBox layoutX="410.0" layoutY="86.0" spacing="10.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1">
+         <children>
+            <Label alignment="TOP_LEFT" prefHeight="20.0" prefWidth="265.0" text="Дата судебного заседания:" wrapText="true" VBox.vgrow="NEVER">
+               <font>
+                  <Font name="Arial Unicode MS" size="14.0" />
+               </font>
+            </Label>
+            <DatePicker fx:id="currDatePicker" prefHeight="26.0" prefWidth="235.0" promptText="выберите дату" />
+            <Label alignment="TOP_LEFT" layoutX="20.0" layoutY="30.0" prefHeight="20.0" prefWidth="265.0" text="Ответчик (заинт. лицо):" wrapText="true">
+               <font>
+                  <Font name="Arial Unicode MS" size="14.0" />
+               </font>
+            </Label>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="20.0" />
+         </padding>
+      </VBox>
+      <VBox alignment="CENTER" spacing="30.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER" />
+      <HBox alignment="CENTER" spacing="20.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+         <children>
+            <Button fx:id="applyFilterButton" contentDisplay="TOP" mnemonicParsing="false" onAction="#saveCase" prefHeight="90.0" prefWidth="130.0" text="Установить фильтры" textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font name="Arial Unicode MS" size="14.0" />
+               </font>
+               <graphic>
+                  <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/filter.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button fx:id="dropFilterButton" contentDisplay="TOP" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#saveCase" prefHeight="90.0" prefWidth="130.0" text="Сбросить фильтры" textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font name="Arial Unicode MS" size="14.0" />
+               </font>
+               <graphic>
+                  <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../images/remove.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+         </children>
+      </HBox>
+      <TextField fx:id="plaintiffTextField" GridPane.columnSpan="2" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin>
+      </TextField>
+      <TextField fx:id="defendantTextField" layoutX="20.0" layoutY="188.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets left="10.0" right="10.0" />
+         </GridPane.margin>
+      </TextField>
+   </children>
+</GridPane>
