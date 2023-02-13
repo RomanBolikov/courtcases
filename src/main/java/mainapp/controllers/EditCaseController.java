@@ -103,13 +103,13 @@ public class EditCaseController extends AbstractCaseController {
 			return;
 		}
 		Court court = courtComboBox.getValue(); // what was specified by user
+		String courtName = court.getName();
 		CourtRepo courtRepo = model.getCourtRepo();
-		Optional<Court> courtInDB = courtRepo.findByName(court.getName()); // try to lookup court in database
-		if (!courtInDB.isPresent()) { // if the court is not in DB then it's saved to it and set as case property
+		if (!courtRepo.existsByName(courtName)) {
 			court = courtRepo.save(court);
 			caseToEdit.setCourt(court);
-		} else if (!court.getName().equals(caseToEdit.getCourt().getName())) { // if such a court exists in DB then
-			caseToEdit.setCourt(courtInDB.get()); // we simply set it as case property
+		} else if (!courtName.equals(caseToEdit.getCourt().getName())) { 	// if such a court exists in DB then
+			caseToEdit.setCourt(courtRepo.findByName(courtName).get()); 	// we simply set it as case property
 		}
 		if (!caseNoTextField.getText().isEmpty())
 			caseToEdit.setCase_no(caseNoTextField.getText());

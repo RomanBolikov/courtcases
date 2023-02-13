@@ -8,6 +8,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -28,11 +29,11 @@ import net.rgielen.fxweaver.core.FxmlView;
 @Component
 @FxmlView("setfilters.fxml")
 public class FilterController {
-	
+
 	private Stage stage;
-	
+
 	private MainController parent;
-	
+
 	private final DataModel model;
 
 	public FilterController(DataModel model) {
@@ -65,10 +66,10 @@ public class FilterController {
 
 	@FXML
 	protected Button applyFilterButton;
-	
+
 	@FXML
 	protected Button dropFilterButton;
-	
+
 	@FXML
 	public void initialize() {
 		this.stage = new Stage();
@@ -92,16 +93,28 @@ public class FilterController {
 				return new Court(string);
 			}
 		});
-		
-		ObjectProperty<Predicate<String>> plaintiffFilter = new SimpleObjectProperty<>();
-        ObjectProperty<Predicate<String>> defendantFilter = new SimpleObjectProperty<>();
 
-        plaintiffFilter.bind(Bindings.createObjectBinding(() -> 
-            acase -> acase.getPlaintiff().toLowerCase().contains(nameFilterField.getText().toLowerCase()), 
-            nameFilterField.textProperty()));
+		ObjectProperty<Predicate<String>> plaintiffFilter = new SimpleObjectProperty<>();
+		plaintiffFilter.bind(Bindings.createObjectBinding(
+				() -> plaintiff -> plaintiff.toLowerCase().contains(plaintiffTextField.getText().toLowerCase()),
+				plaintiffTextField.textProperty()));
+
+		ObjectProperty<Predicate<String>> defendantFilter = new SimpleObjectProperty<>();
+		defendantFilter.bind(Bindings.createObjectBinding(
+				() -> defendant -> defendant.toLowerCase().contains(defendantTextField.getText().toLowerCase()),
+				plaintiffTextField.textProperty()));
+
 	}
-	
+
+	private void applyFilters(ActionEvent actionEvent) {
+
+	}
+
 	public void setParent(MainController parent) {
 		this.parent = parent;
+	}
+
+	public void show() {
+		// todo
 	}
 }

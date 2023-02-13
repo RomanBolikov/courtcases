@@ -1,6 +1,5 @@
 package mainapp.controllers;
 
-import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
@@ -102,9 +101,8 @@ public class AddCaseController extends AbstractCaseController {
 			displayErrors();
 		} else {
 			Court court = courtComboBox.getValue();
-			Optional<Court> courtInDB = model.getCourtRepo().findByName(court.getName());
-			if (courtInDB.isPresent())
-				court = courtInDB.get();
+			if (model.getCourtRepo().existsByName(court.getName()))
+				court = model.getCourtRepo().findByName(court.getName()).get();
 			else
 				court = model.getCourtRepo().save(court);
 			ACase newCase = new ACase(relationChoiceBox.getValue(), caseTypeChoiceBox.getValue(), description.getText(),

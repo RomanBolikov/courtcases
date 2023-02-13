@@ -8,4 +8,5 @@ import org.springframework.data.repository.CrudRepository;
 public interface CourtRepo extends CrudRepository<Court, Integer> {
 	List<Court> findAll();
 	Optional<Court> findByName(String name);
+	boolean existsByName(String name);
 }

@@ -3,7 +3,9 @@ package mainapp.controllers;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import javax.persistence.OptimisticLockException;
 
@@ -35,6 +37,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import mainapp.customGUI.CustomAlert;
 import mainapp.data.ACase;
+import mainapp.data.CaseFilter;
 import mainapp.data.CaseRepo;
 import mainapp.data.DataModel;
 import mainapp.data.Representative;
@@ -49,7 +52,9 @@ public class MainController {
 	private final CaseRepo caseRepo;
 
 	private ObservableList<ACase> caseList;
-
+	
+	private final CaseFilter caseFilter;
+	
 	private Representative user;
 
 	private FxWeaver fxWeaver;
@@ -60,10 +65,11 @@ public class MainController {
 	private final Image removeIcon = new Image(
 			this.getClass().getResource("/mainapp/images/remove.png").toExternalForm());
 
-	public MainController(DataModel model, FxWeaver fxWeaver) {
+	public MainController(DataModel model, FxWeaver fxWeaver, CaseFilter casefilter) {
 		this.caseRepo = model.getCaseRepo();
 		this.caseList = FXCollections.observableArrayList(model.getCaseRepo().findAll());
 		this.fxWeaver = fxWeaver;
+		this.caseFilter = casefilter;
 	}
 
 // 	FXML GUI elements
@@ -207,6 +213,7 @@ public class MainController {
 	private void applyFilters(ActionEvent actionEvent) {
 		FilterController filterController = fxWeaver.loadController(FilterController.class);
 		filterController.setParent(this);
+		filterController.show();
 	}
 	
 	@FXML
@@ -244,7 +251,7 @@ public class MainController {
 				.show();
 			} finally {
 				refreshTable();
-//				tableView.setItems(caseList.filtered(this::filterPredicate));
+				tableView.setItems(caseList.filtered(this::filterPredicate));
 			}
 		}
 	}

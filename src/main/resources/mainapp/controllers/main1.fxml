@@ -145,7 +145,7 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <Button fx:id="applyFilterButton" alignment="CENTER" mnemonicParsing="false" prefHeight="50.0" prefWidth="100.0" text="Настроить фильтры" textAlignment="CENTER" wrapText="true" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+      <Button fx:id="applyFilterButton" alignment="CENTER" mnemonicParsing="false" onAction="#applyFilters" prefHeight="50.0" prefWidth="100.0" text="Задать фильтры" textAlignment="CENTER" wrapText="true" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
          <font>
             <Font size="14.0" />
          </font>
