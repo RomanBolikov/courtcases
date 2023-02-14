@@ -19,6 +19,7 @@
   <columnConstraints>
       <ColumnConstraints hgrow="NEVER" maxWidth="1088.8" minWidth="10.0" prefWidth="142.133349609375" />
       <ColumnConstraints hgrow="NEVER" maxWidth="1088.8" minWidth="10.0" prefWidth="127.46669921875" />
+      <ColumnConstraints hgrow="NEVER" maxWidth="1088.8" minWidth="10.0" prefWidth="127.46669921875" />
     <ColumnConstraints hgrow="SOMETIMES" />
   </columnConstraints>
   <rowConstraints>
@@ -27,16 +28,11 @@
       <RowConstraints maxHeight="596.0000030517579" minHeight="10.0" prefHeight="566.4000137329101" vgrow="ALWAYS" />
   </rowConstraints>
    <children>
-      <HBox alignment="BOTTOM_RIGHT" spacing="50.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+      <HBox alignment="BOTTOM_RIGHT" spacing="50.0" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
          <GridPane.margin>
             <Insets />
          </GridPane.margin>
          <children>
-            <Label fx:id="filterLabel" alignment="CENTER" text="Установлены фильтры" textFill="RED">
-               <font>
-                  <Font name="Arial Unicode MS" size="18.0" />
-               </font>
-            </Label>
             <Button fx:id="changeUser" mnemonicParsing="false" onAction="#changeUser" text="Сменить пользователя">
                <font>
                   <Font name="Arial Unicode MS" size="14.0" />
@@ -52,7 +48,7 @@
             </Label>
          </children>
       </HBox>
-      <HBox spacing="10.0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+      <HBox spacing="10.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
          <children>
             <Button fx:id="addCaseButton" contentDisplay="TOP" mnemonicParsing="false" onAction="#addCase" prefHeight="60.0" prefWidth="130.0" text="Добавить">
                <font>
@@ -112,7 +108,7 @@
       </HBox>
       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.rowIndex="1">
          <children>
-            <CheckBox fx:id="archiveCheckbox" alignment="CENTER" mnemonicParsing="false" text="Включать архивные дела" textAlignment="CENTER" wrapText="true">
+            <CheckBox fx:id="archiveCheckbox" alignment="CENTER" mnemonicParsing="false" text="Показать архивные дела" textAlignment="CENTER" wrapText="true">
                <font>
                   <Font size="14.0" />
                </font>
@@ -131,7 +127,7 @@
             </Button>
          </children>
       </VBox>
-      <TableView fx:id="tableView" style="-fx-selection-bar: #E1E1E1;" GridPane.columnSpan="3" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
+      <TableView fx:id="tableView" style="-fx-selection-bar: #E1E1E1;" GridPane.columnSpan="4" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="courtColumn" text="Суд" />
             <TableColumn fx:id="numberColumn" text="№ дела" />
@@ -158,5 +154,10 @@
             <Font size="14.0" />
          </font>
       </Button>
+      <Label fx:id="filterLabel" alignment="CENTER" text="Установлены фильтры" textAlignment="CENTER" textFill="RED" wrapText="true" GridPane.columnIndex="2">
+         <font>
+            <Font name="Arial Unicode MS" size="18.0" />
+         </font>
+      </Label>
    </children>
 </GridPane>

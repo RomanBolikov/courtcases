@@ -134,7 +134,7 @@ public class AdminController {
 			tableView.refresh();
 			return;
 		}
-		// this part of the method works only for non-admin users and sets a password for them
+		// this part of the method works only for users with admin privileges and sets a password for them
 		Dialog<String> prompt = new PasswordSetDialog();
 		prompt.setHeaderText("Установите пароль");
 		CustomAlert alert = new CustomAlert("Ошибка", "", "Неверный ввод!",

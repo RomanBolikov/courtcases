@@ -2,15 +2,19 @@ package mainapp.controllers;
 
 import java.util.Optional;
 
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.stage.Stage;
 import mainapp.customGUI.CustomAlert;
+import mainapp.customGUI.PasswordSetDialog;
 import mainapp.data.Representative;
 import net.rgielen.fxweaver.core.FxmlView;
 
@@ -19,7 +23,7 @@ import net.rgielen.fxweaver.core.FxmlView;
 public class AddUserController extends AbstractUserController {
 
 	private Representative newUser;
-	
+
 	@Override
 	@FXML
 	public void initialize() {
@@ -39,6 +43,34 @@ public class AddUserController extends AbstractUserController {
 		else {
 			newUser = new Representative(input);
 			newUser.setIsAdmin(checkBox.isSelected() ? true : false);
+			if (newUser.isAdmin()) {
+				Dialog<String> prompt = new PasswordSetDialog();
+				prompt.setHeaderText("Установите пароль");
+				CustomAlert alert = new CustomAlert("Ошибка", "",
+						"Проверьте, что пароль не пустой, а также что пароль и подтверждение совпадают",
+						new ButtonType("Повторить", ButtonData.OK_DONE),
+						new ButtonType("Закрыть", ButtonData.CANCEL_CLOSE));
+				while (true) {
+					Optional<String> newPassword = prompt.showAndWait();
+					if (newPassword.isPresent()) {
+						if (!newPassword.get().equals("invalid")) {
+							String pswHash = BCrypt.hashpw(newPassword.get(), BCrypt.gensalt(4));
+							newUser.setPassword(pswHash);
+							new CustomAlert("Подтверждение", "", "Пароль успешно установлен!", ButtonType.OK).show();
+							break;
+						} else {
+							Optional<ButtonType> retry = alert.showAndWait();
+							if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE) {
+								newUser = null;
+								break;
+							}
+						}
+					} else {
+						newUser = null;
+						break;
+					}
+				}
+			}
 			stage.close();
 		}
 	}
