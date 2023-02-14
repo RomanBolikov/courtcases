@@ -109,7 +109,7 @@ public class AddCaseController extends AbstractCaseController {
 					court, plaintiffTextField.getText(), defendantTextField.getText(), stageChoiceBox.getValue(),
 					currentState.getText());
 			if (!caseNoTextField.getText().isEmpty())
-				newCase.setCase_no(caseNoTextField.getText());
+				newCase.setCaseNo(caseNoTextField.getText());
 			if (representativeChoiceBox.getValue() != null)
 				newCase.setRepr(representativeChoiceBox.getValue());
 			if (currDatePicker.getValue() != null && !hourTextField.getText().isEmpty()
@@ -117,10 +117,10 @@ public class AddCaseController extends AbstractCaseController {
 				try {
 					int hours = Integer.parseInt(hourTextField.getText(), 10);
 					int mins = Integer.parseInt(minuteTextField.getText(), 10);
-					newCase.setCurr_date(
+					newCase.setCurrentDate(
 							DatePickerConverter.convertToTimestamp(currDatePicker.getValue(), hours, mins));
 				} catch (NumberFormatException nfe) {
-					newCase.setCurr_date(null);
+					newCase.setCurrentDate(null);
 				}
 			}
 			newCase = model.getCaseRepo().save(newCase);

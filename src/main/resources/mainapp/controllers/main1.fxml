@@ -32,6 +32,11 @@
             <Insets />
          </GridPane.margin>
          <children>
+            <Label fx:id="filterLabel" alignment="CENTER" text="Установлены фильтры" textFill="RED">
+               <font>
+                  <Font name="Arial Unicode MS" size="18.0" />
+               </font>
+            </Label>
             <Button fx:id="changeUser" mnemonicParsing="false" onAction="#changeUser" text="Сменить пользователя">
                <font>
                   <Font name="Arial Unicode MS" size="14.0" />
@@ -140,11 +145,6 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy>
       </TableView>
-      <Label fx:id="filterLabel" prefHeight="20.0" prefWidth="107.0" text="Внимание! Настроены фильтры!" textFill="RED" visible="false" GridPane.columnSpan="2">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
       <Button fx:id="applyFilterButton" alignment="CENTER" mnemonicParsing="false" onAction="#applyFilters" prefHeight="50.0" prefWidth="100.0" text="Задать фильтры" textAlignment="CENTER" wrapText="true" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
          <font>
             <Font size="14.0" />
@@ -153,7 +153,7 @@
             <Insets />
          </GridPane.margin>
       </Button>
-      <Button fx:id="dropFilterButton" alignment="CENTER" mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0" text="Сбросить фильтры" textAlignment="CENTER" wrapText="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+      <Button fx:id="dropFilterButton" alignment="CENTER" mnemonicParsing="false" onAction="#dropFilters" prefHeight="50.0" prefWidth="90.0" text="Сбросить фильтры" textAlignment="CENTER" wrapText="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
          <font>
             <Font size="14.0" />
          </font>

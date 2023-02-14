@@ -3,9 +3,7 @@ package mainapp.controllers;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import javax.persistence.OptimisticLockException;
 
@@ -52,9 +50,9 @@ public class MainController {
 	private final CaseRepo caseRepo;
 
 	private ObservableList<ACase> caseList;
-	
+
 	private final CaseFilter caseFilter;
-	
+
 	private Representative user;
 
 	private FxWeaver fxWeaver;
@@ -76,7 +74,7 @@ public class MainController {
 
 	@FXML
 	private Label filterLabel;
-	
+
 	@FXML
 	private Label userLabel;
 
@@ -121,17 +119,16 @@ public class MainController {
 
 	@FXML
 	private Button applyFilterButton;
-	
+
 	@FXML
 	private Button dropFilterButton;
-	
+
 	@FXML
 	private CheckBox archiveCheckbox;
-	
+
 	@FXML
 	private Button refreshButton;
 
-	
 //  *********************************************
 
 // 	FXML-annotated methods
@@ -140,14 +137,14 @@ public class MainController {
 	public void initialize() {
 		titleColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getTitle()));
 		courtColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getCourt().toString()));
-		numberColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getCase_no()));
+		numberColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getCaseNo()));
 		plaintiffColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getPlaintiff()));
 		defendantColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getDefendant()));
 		reprColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getRepr().toString()));
 		dateColumn.setCellValueFactory(cdf -> {
 			SimpleStringProperty property = new SimpleStringProperty();
 			ACase thisCase = cdf.getValue();
-			Timestamp date = thisCase.getCurr_date();
+			Timestamp date = thisCase.getCurrentDate();
 			if (date == null)
 				property.setValue(thisCase.isArchive() ? "" : "не назначено");
 			else {
@@ -185,7 +182,8 @@ public class MainController {
 				return cell;
 			};
 		});
-		// setting rows displayed in green for archived cases and make rows editable by double-clicking
+		// setting rows displayed in green for archived cases and make rows editable by
+		// double-clicking
 		tableView.setRowFactory(tv -> {
 			TableRow<ACase> row = new TableRow<ACase>() {
 				@Override
@@ -202,11 +200,12 @@ public class MainController {
 			};
 			row.setOnMouseClicked(evt -> {
 				if (evt.getButton().equals(MouseButton.PRIMARY) && evt.getClickCount() == 2)
-			        editCase(new ActionEvent());	
-				});
+					editCase(new ActionEvent());
+			});
 			return row;
 		});
 		tableView.getSelectionModel().selectedItemProperty().addListener(this::enableEditButton);
+		archiveCheckbox.selectedProperty().addListener((e, oldVal, newVal) -> refreshTable());
 	}
 
 	@FXML
@@ -215,7 +214,20 @@ public class MainController {
 		filterController.setParent(this);
 		filterController.show();
 	}
-	
+
+	@FXML
+	private void dropFilters(ActionEvent actionEvent) {
+		caseFilter.setCourt(null);
+		caseFilter.setCurrentDate(null);
+		caseFilter.setDefendant(null);
+		caseFilter.setPlaintiff(null);
+		caseFilter.setRelation(null);
+		caseFilter.setRepr(null);
+		caseFilter.setType(null);
+		disableDropFilterButton(true);
+		refreshTable();
+	}
+
 	@FXML
 	private void addCase(ActionEvent actionEvent) {
 		fxWeaver.loadController(AddCaseController.class).show(caseList, user);
@@ -243,15 +255,14 @@ public class MainController {
 		if (confirmed.isPresent() && confirmed.get() == ButtonType.OK) {
 			ACase acase = tableView.getSelectionModel().getSelectedItem();
 			acase.setIsArchive(true);
-			acase.setCurr_date(null);
+			acase.setCurrentDate(null);
 			try {
 				caseRepo.save(acase);
 			} catch (OptimisticLockException ole) {
 				new CustomAlert("Обновление данных", "", "Параметры дела изменены другим пользователем!", ButtonType.OK)
-				.show();
+						.show();
 			} finally {
 				refreshTable();
-				tableView.setItems(caseList.filtered(this::filterPredicate));
 			}
 		}
 	}
@@ -271,9 +282,10 @@ public class MainController {
 //	***************************************************************************
 
 	/**
-	 * loads the main stage with a certain user (aka Representative)
-	 * modifies Archive Button, implementing privilege restrictions for non-admin users to move and restore cases
-	 * to/from archive
+	 * loads the main stage with a certain user (aka Representative) modifies
+	 * Archive Button, implementing privilege restrictions for non-admin users to
+	 * move and restore cases to/from archive
+	 * 
 	 * @param user the Representative chosen on login stage
 	 */
 	public void displayUser(Representative user) {
@@ -284,13 +296,18 @@ public class MainController {
 			tableView.getSelectionModel().selectedItemProperty().removeListener(this::modifyArchiveButton);
 		} else
 			tableView.getSelectionModel().selectedItemProperty().addListener(this::modifyArchiveButton);
+		caseFilter.setRepr(user);
+		refreshTable();
 	}
 
 	/**
-	 * this method is bound to a ChangeListener and modifies the Archive Button, disabling it if no case is selected,
-	 * and changing its onAction event, text and icon depending on whether the selected case is in archive
+	 * this method is bound to a ChangeListener and modifies the Archive Button,
+	 * disabling it if no case is selected, and changing its onAction event, text
+	 * and icon depending on whether the selected case is in archive
+	 * 
 	 * @param property - selection property (i.e. the case selected)
-	 * @param oldValue - the case previously selected - this parameter is disregarded
+	 * @param oldValue - the case previously selected - this parameter is
+	 *                 disregarded
 	 * @param newValue - the case currently selected
 	 */
 	private void modifyArchiveButton(ObservableValue<? extends ACase> property, ACase oldValue, ACase newValue) {
@@ -304,10 +321,17 @@ public class MainController {
 		}
 	}
 
+	void disableDropFilterButton(boolean disable) {
+		dropFilterButton.setDisable(disable);
+		filterLabel.setVisible(!disable);
+	}
+
 	/**
 	 * if the case selected is an archive one, this method disables edit button
+	 * 
 	 * @param property - selection property (i.e. the case selected)
-	 * @param oldValue - the case previously selected - this parameter is disregarded
+	 * @param oldValue - the case previously selected - this parameter is
+	 *                 disregarded
 	 * @param newValue - the case currently selected
 	 */
 	private void enableEditButton(ObservableValue<? extends ACase> property, ACase oldValue, ACase newValue) {
@@ -317,16 +341,8 @@ public class MainController {
 			editCaseButton.setDisable(false);
 	}
 
-//	private boolean filterPredicate(ACase acase) {
-//		boolean allCases = true, includeArchiveCases = !acase.isArchive();
-//		if ((String) toggleGroup.getSelectedToggle().getUserData() == "myCases")
-//			allCases = acase.getRepr().toString().equals(user.toString());
-//		if (archiveCases.isSelected())
-//			includeArchiveCases = true;
-//		return allCases && includeArchiveCases;
-//	}
-	
 	public void refreshTable() {
-		tableView.refresh();
+		tableView.setItems(
+				caseList.filtered(caseFilter.and(acase -> archiveCheckbox.isSelected() ? true : !acase.isArchive())));
 	}
 }

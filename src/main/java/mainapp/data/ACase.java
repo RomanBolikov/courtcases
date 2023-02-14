@@ -38,7 +38,7 @@ public class ACase {
 	@NonNull
 	@ManyToOne
 	@JoinColumn(name = "case_type", nullable = false)
-	private CaseType case_type;
+	private CaseType caseType;
 	
 	@NonNull
 	@Column(name = "case_title", nullable = false)
@@ -49,7 +49,7 @@ public class ACase {
 	@JoinColumn(name = "court", nullable = false)
 	private Court court;
 
-	private String case_no;
+	private String caseNo;
 	
 	@NonNull
 	@Column(nullable = false)
@@ -68,11 +68,12 @@ public class ACase {
 	@JoinColumn(name = "stage", nullable = false)
 	private Stage stage;
 
-	private Timestamp curr_date;
+	@Column(name = "curr_date")
+	private Timestamp currentDate;
 	
 	@NonNull
-	@Column(nullable = false)
-	private String curr_state;
+	@Column(name = "curr_state", nullable = false)
+	private String currentState;
 	
 	@Column(name = "isarchive", nullable = false)	
 	private Boolean isArchive = false;

@@ -112,7 +112,7 @@ public class EditCaseController extends AbstractCaseController {
 			caseToEdit.setCourt(courtRepo.findByName(courtName).get()); 	// we simply set it as case property
 		}
 		if (!caseNoTextField.getText().isEmpty())
-			caseToEdit.setCase_no(caseNoTextField.getText());
+			caseToEdit.setCaseNo(caseNoTextField.getText());
 		String repr = representativeChoiceBox.getValue().getName();
 		if (!repr.equals(caseToEdit.getRepr().getName()))
 			caseToEdit.setRepr(model.getReprRepo().findByName(repr));
@@ -121,22 +121,22 @@ public class EditCaseController extends AbstractCaseController {
 			try {
 				int hours = Integer.parseInt(hourTextField.getText());
 				int mins = Integer.parseInt(minuteTextField.getText());
-				caseToEdit.setCurr_date(DatePickerConverter.convertToTimestamp(currDatePicker.getValue(), hours, mins));
+				caseToEdit.setCurrentDate(DatePickerConverter.convertToTimestamp(currDatePicker.getValue(), hours, mins));
 			} catch (NumberFormatException e) {
-				caseToEdit.setCurr_date(null);
+				caseToEdit.setCurrentDate(null);
 			}
 		} else
-			caseToEdit.setCurr_date(null);
+			caseToEdit.setCurrentDate(null);
 		if (!description.getText().equals(caseToEdit.getTitle()))
 			caseToEdit.setTitle(description.getText());
-		if (!caseNoTextField.getText().equals(caseToEdit.getCase_no()))
-			caseToEdit.setCase_no(caseNoTextField.getText());
+		if (!caseNoTextField.getText().equals(caseToEdit.getCaseNo()))
+			caseToEdit.setCaseNo(caseNoTextField.getText());
 		if (!plaintiffTextField.getText().equals(caseToEdit.getPlaintiff()))
 			caseToEdit.setPlaintiff(plaintiffTextField.getText());
 		if (!defendantTextField.getText().equals(caseToEdit.getDefendant()))
 			caseToEdit.setDefendant(defendantTextField.getText());
-		if (!currentState.getText().equals(caseToEdit.getCurr_state()))
-			caseToEdit.setCurr_state(currentState.getText());
+		if (!currentState.getText().equals(caseToEdit.getCurrentState()))
+			caseToEdit.setCurrentState(currentState.getText());
 		try {
 			caseToEdit = model.getCaseRepo().save(caseToEdit);
 			new CustomAlert("Подтверждение", "", "Дело внесено в базу данных!", ButtonType.OK).show();
@@ -154,21 +154,21 @@ public class EditCaseController extends AbstractCaseController {
 	public void show(ACase caseToEdit) {
 		this.caseToEdit = caseToEdit;
 		Relation relation = caseToEdit.getRelation();
-		Timestamp timestamp = caseToEdit.getCurr_date();
+		Timestamp timestamp = caseToEdit.getCurrentDate();
 		LocalDate date = DatePickerConverter.extractLocalDate(timestamp);
 		int[] time = DatePickerConverter.extractTime(timestamp);
 
 		// setting inputs according to the current data stored in DB
 		plaintiffTextField.setText(caseToEdit.getPlaintiff());
 		defendantTextField.setText(caseToEdit.getDefendant());
-		caseTypeChoiceBox.setValue(caseToEdit.getCase_type());
+		caseTypeChoiceBox.setValue(caseToEdit.getCaseType());
 		relationChoiceBox.setValue(relation);
 		representativeChoiceBox.setValue(caseToEdit.getRepr());
 		stageChoiceBox.setValue(caseToEdit.getStage());
 		courtComboBox.setValue(caseToEdit.getCourt());
-		caseNoTextField.setText(caseToEdit.getCase_no());
+		caseNoTextField.setText(caseToEdit.getCaseNo());
 		description.setText(caseToEdit.getTitle());
-		currentState.setText(caseToEdit.getCurr_state());
+		currentState.setText(caseToEdit.getCurrentState());
 		currDatePicker.setValue(date);
 		if (date != null)
 			currDatePicker.getEditor()
@@ -181,7 +181,7 @@ public class EditCaseController extends AbstractCaseController {
 		// adding listeners to avoid extra DB operations
 		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> setRestrictions(newVal));
 		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setRelation(newVal));
-		caseTypeChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setCase_type(newVal));
+		caseTypeChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setCaseType(newVal));
 		representativeChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setRepr(newVal));
 		stageChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setStage(newVal));
 		courtComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {

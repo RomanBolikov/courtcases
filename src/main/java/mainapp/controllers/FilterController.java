@@ -1,24 +1,18 @@
 package mainapp.controllers;
 
-import java.util.function.Predicate;
-
 import org.springframework.stereotype.Component;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
+import mainapp.data.CaseFilter;
 import mainapp.data.CaseType;
 import mainapp.data.Court;
 import mainapp.data.DataModel;
@@ -35,9 +29,12 @@ public class FilterController {
 	private MainController parent;
 
 	private final DataModel model;
+	
+	private final CaseFilter caseFilter;
 
-	public FilterController(DataModel model) {
+	public FilterController(DataModel model, CaseFilter caseFilter) {
 		this.model = model;
+		this.caseFilter = caseFilter;
 	}
 
 	@FXML
@@ -53,7 +50,7 @@ public class FilterController {
 	private ChoiceBox<Representative> representativeChoiceBox;
 
 	@FXML
-	private ComboBox<Court> courtComboBox;
+	private ChoiceBox<Court> courtChoiceBox;
 
 	@FXML
 	private DatePicker currDatePicker;
@@ -79,42 +76,44 @@ public class FilterController {
 		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(model.getCaseTypeRepo().findAll()));
 		relationChoiceBox.setItems(FXCollections.observableArrayList(model.getRelationRepo().findAll()));
 		representativeChoiceBox.setItems(FXCollections.observableArrayList(model.getReprRepo().findAll()));
-		courtComboBox.setItems(FXCollections.observableArrayList(model.getCourtRepo().findAll()));
-		courtComboBox.setConverter(new StringConverter<Court>() {
-			@Override
-			public String toString(Court court) {
-				if (court == null)
-					return "";
-				return court.getName();
-			}
-
-			@Override
-			public Court fromString(String string) {
-				return new Court(string);
-			}
-		});
-
-		ObjectProperty<Predicate<String>> plaintiffFilter = new SimpleObjectProperty<>();
-		plaintiffFilter.bind(Bindings.createObjectBinding(
-				() -> plaintiff -> plaintiff.toLowerCase().contains(plaintiffTextField.getText().toLowerCase()),
-				plaintiffTextField.textProperty()));
-
-		ObjectProperty<Predicate<String>> defendantFilter = new SimpleObjectProperty<>();
-		defendantFilter.bind(Bindings.createObjectBinding(
-				() -> defendant -> defendant.toLowerCase().contains(defendantTextField.getText().toLowerCase()),
-				plaintiffTextField.textProperty()));
-
+		courtChoiceBox.setItems(FXCollections.observableArrayList(model.getCourtRepo().findAll()));
 	}
 
+	@FXML
 	private void applyFilters(ActionEvent actionEvent) {
-
+		caseFilter.setRelation(relationChoiceBox.getValue());
+		caseFilter.setType(caseTypeChoiceBox.getValue());
+		caseFilter.setRepr(representativeChoiceBox.getValue());
+		caseFilter.setCourt(courtChoiceBox.getValue());
+		caseFilter.setCurrentDate(currDatePicker.getValue());
+		caseFilter.setPlaintiff(plaintiffTextField.getText());
+		caseFilter.setDefendant(defendantTextField.getText());
+		stage.close();
+		parent.disableDropFilterButton(false);
+		parent.refreshTable();
 	}
 
+	@FXML
+	private void dropFilters(ActionEvent actionEvent) {
+		caseTypeChoiceBox.setValue(null);
+		relationChoiceBox.setValue(null);
+		representativeChoiceBox.setValue(null);
+		courtChoiceBox.setValue(null);
+		currDatePicker.setValue(null);
+		plaintiffTextField.setText("");
+		defendantTextField.setText("");
+	}
+	
 	public void setParent(MainController parent) {
 		this.parent = parent;
 	}
 
 	public void show() {
-		// todo
+		caseTypeChoiceBox.setValue(caseFilter.getType());
+		relationChoiceBox.setValue(caseFilter.getRelation());
+		representativeChoiceBox.setValue(caseFilter.getRepr());
+		courtChoiceBox.setValue(caseFilter.getCourt());
+		currDatePicker.setValue(caseFilter.getCurrentDate());
+		stage.show();	
 	}
 }
