@@ -128,7 +128,6 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 		FxControllerAndView<MainController, Parent> main = fxWeaver.load(MainController.class);
 		stage.setScene(new Scene(main.getView().get()));
 		stage.setMaximized(true);
-//		stage.setResizable(false);
 		main.getController().displayUser(user);
 	}
 	

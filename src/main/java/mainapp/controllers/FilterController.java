@@ -1,5 +1,8 @@
 package mainapp.controllers;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Component;
 
 import javafx.collections.FXCollections;
@@ -13,11 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import mainapp.data.CaseFilter;
-import mainapp.data.CaseType;
-import mainapp.data.Court;
 import mainapp.data.DataModel;
-import mainapp.data.Relation;
-import mainapp.data.Representative;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
@@ -29,7 +28,7 @@ public class FilterController {
 	private MainController parent;
 
 	private final DataModel model;
-	
+
 	private final CaseFilter caseFilter;
 
 	public FilterController(DataModel model, CaseFilter caseFilter) {
@@ -41,16 +40,16 @@ public class FilterController {
 	private GridPane gridPane;
 
 	@FXML
-	private ChoiceBox<CaseType> caseTypeChoiceBox;
+	private ChoiceBox<String> caseTypeChoiceBox;
 
 	@FXML
-	private ChoiceBox<Relation> relationChoiceBox;
+	private ChoiceBox<String> relationChoiceBox;
 
 	@FXML
-	private ChoiceBox<Representative> representativeChoiceBox;
+	private ChoiceBox<String> representativeChoiceBox;
 
 	@FXML
-	private ChoiceBox<Court> courtChoiceBox;
+	private ChoiceBox<String> courtChoiceBox;
 
 	@FXML
 	private DatePicker currDatePicker;
@@ -73,10 +72,18 @@ public class FilterController {
 		stage.setTitle("Установка фильтров в таблице");
 		stage.setResizable(false);
 		stage.setScene(new Scene(gridPane));
-		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(model.getCaseTypeRepo().findAll()));
-		relationChoiceBox.setItems(FXCollections.observableArrayList(model.getRelationRepo().findAll()));
-		representativeChoiceBox.setItems(FXCollections.observableArrayList(model.getReprRepo().findAll()));
-		courtChoiceBox.setItems(FXCollections.observableArrayList(model.getCourtRepo().findAll()));
+		List<String> typeList = model.getCaseTypeRepo().findAll().stream().map(type -> type.toString())
+				.collect(Collectors.toList());
+		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(typeList));
+		List<String> relationList = model.getRelationRepo().findAll().stream().map(rel -> rel.toString())
+				.collect(Collectors.toList());
+		relationChoiceBox.setItems(FXCollections.observableArrayList(relationList));
+		List<String> reprList = model.getReprRepo().findAll().stream().map(repr -> repr.toString())
+				.collect(Collectors.toList());
+		representativeChoiceBox.setItems(FXCollections.observableArrayList(reprList));
+		List<String> courtList = model.getCourtRepo().findAll().stream().map(court -> court.toString())
+				.collect(Collectors.toList());
+		courtChoiceBox.setItems(FXCollections.observableArrayList(courtList));
 	}
 
 	@FXML
@@ -103,7 +110,7 @@ public class FilterController {
 		plaintiffTextField.setText("");
 		defendantTextField.setText("");
 	}
-	
+
 	public void setParent(MainController parent) {
 		this.parent = parent;
 	}
@@ -114,6 +121,6 @@ public class FilterController {
 		representativeChoiceBox.setValue(caseFilter.getRepr());
 		courtChoiceBox.setValue(caseFilter.getCourt());
 		currDatePicker.setValue(caseFilter.getCurrentDate());
-		stage.show();	
+		stage.show();
 	}
 }

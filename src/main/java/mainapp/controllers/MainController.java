@@ -166,9 +166,7 @@ public class MainController {
 							setText(null);
 							setGraphic(null);
 							setStyle("");
-						} else if (item.equals("не назначено"))
-							setTextFill(Color.RED);
-						else if (!item.isEmpty()) {
+						} else if (!item.isEmpty() && !item.equals("не назначено")) {
 							DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 							LocalDateTime datetime = LocalDateTime.parse(item, formatter);
 							setTextFill(datetime.isBefore(LocalDateTime.now()) ? Color.RED : Color.BLACK);
@@ -205,7 +203,8 @@ public class MainController {
 			return row;
 		});
 		tableView.getSelectionModel().selectedItemProperty().addListener(this::enableEditButton);
-		archiveCheckbox.selectedProperty().addListener((e, oldVal, newVal) -> refreshTable());
+		archiveCheckbox.selectedProperty().addListener((obs, oldVal, newVal) -> refreshTable());
+		refreshButton.setOnAction(evt -> tableView.refresh());
 	}
 
 	@FXML
@@ -296,7 +295,7 @@ public class MainController {
 			tableView.getSelectionModel().selectedItemProperty().removeListener(this::modifyArchiveButton);
 		} else
 			tableView.getSelectionModel().selectedItemProperty().addListener(this::modifyArchiveButton);
-		caseFilter.setRepr(user);
+		caseFilter.setRepr(user.toString());
 		refreshTable();
 	}
 
