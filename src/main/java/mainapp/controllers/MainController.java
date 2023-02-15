@@ -1,5 +1,7 @@
 package mainapp.controllers;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -7,6 +9,7 @@ import java.util.Optional;
 
 import javax.persistence.OptimisticLockException;
 
+import org.apache.poi.EncryptedDocumentException;
 import org.springframework.stereotype.Component;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -31,6 +34,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import mainapp.customGUI.CustomAlert;
@@ -39,6 +43,7 @@ import mainapp.data.CaseFilter;
 import mainapp.data.CaseRepo;
 import mainapp.data.DataModel;
 import mainapp.data.Representative;
+import mainapp.data.XLSXFileWriter;
 import net.rgielen.fxweaver.core.FxControllerAndView;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -56,6 +61,8 @@ public class MainController {
 	private Representative user;
 
 	private FxWeaver fxWeaver;
+
+	private Stage stage;
 
 	private final Image restoreIcon = new Image(
 			this.getClass().getResource("/mainapp/images/restore.png").toExternalForm());
@@ -128,6 +135,9 @@ public class MainController {
 
 	@FXML
 	private Button refreshButton;
+
+	@FXML
+	private Button createReportButton;
 
 //  *********************************************
 
@@ -278,6 +288,27 @@ public class MainController {
 		}
 	}
 
+	@FXML
+	private void createReport(ActionEvent actionEvent) {
+		DirectoryChooser dialog = new DirectoryChooser();
+		dialog.setInitialDirectory(new File("C:\\Prog\\Java\\Spring\\testdir"));
+		File saveDir = dialog.showDialog(stage);
+		boolean reportSaved;
+		try {
+			reportSaved = XLSXFileWriter.createReport(saveDir);
+		} catch (EncryptedDocumentException e) {
+			reportSaved = false;
+			e.printStackTrace();
+		} catch (IOException e) {
+			reportSaved = false;
+			e.printStackTrace();
+		}
+		if (reportSaved) 
+			new CustomAlert("Сохранение отчета", "Отчет сохранен!", "", ButtonType.OK).show();
+		else
+			new CustomAlert("Сохранение отчета", "Не удалось сохранить отчет!", "", ButtonType.CLOSE).show();
+	}
+
 //	***************************************************************************
 
 	/**
@@ -343,5 +374,9 @@ public class MainController {
 	public void refreshTable() {
 		tableView.setItems(
 				caseList.filtered(caseFilter.and(acase -> archiveCheckbox.isSelected() ? true : !acase.isArchive())));
+	}
+
+	public void setStage(Stage stage) {
+		this.stage = stage;
 	}
 }

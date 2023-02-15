@@ -129,6 +129,7 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 		stage.setScene(new Scene(main.getView().get()));
 		stage.setMaximized(true);
 		stage.setResizable(true);
+		main.getController().setStage(stage);
 		main.getController().displayUser(user);
 	}
 	

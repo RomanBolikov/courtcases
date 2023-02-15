@@ -86,7 +86,7 @@
                   </ImageView>
                </graphic>
             </Button>
-            <Button contentDisplay="TOP" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="60.0" prefWidth="194.0" text="Сформировать отчет">
+            <Button fx:id="createReportButton" contentDisplay="TOP" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#createReport" prefHeight="60.0" prefWidth="194.0" text="Сформировать отчет">
                <font>
                   <Font name="Arial Unicode MS" size="14.0" />
                </font>
