@@ -12,6 +12,8 @@ public interface CaseRepo extends CrudRepository<ACase, Integer> {
 	
 	List<ACase> findByRepr(Representative repr);
 	
+	List<ACase> findByRelation(Relation relation);
+	
 	@SuppressWarnings("unchecked")
 	@Lock(value = LockModeType.OPTIMISTIC_FORCE_INCREMENT)
 	ACase save (ACase entity);

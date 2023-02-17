@@ -1,7 +1,6 @@
 package mainapp.controllers;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,7 +8,6 @@ import java.util.Optional;
 
 import javax.persistence.OptimisticLockException;
 
-import org.apache.poi.EncryptedDocumentException;
 import org.springframework.stereotype.Component;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -52,6 +50,8 @@ import net.rgielen.fxweaver.core.FxmlView;
 @FxmlView("main1.fxml")
 public class MainController {
 
+	private final DataModel model;
+	
 	private final CaseRepo caseRepo;
 
 	private ObservableList<ACase> caseList;
@@ -71,6 +71,7 @@ public class MainController {
 			this.getClass().getResource("/mainapp/images/remove.png").toExternalForm());
 
 	public MainController(DataModel model, FxWeaver fxWeaver, CaseFilter casefilter) {
+		this.model = model;
 		this.caseRepo = model.getCaseRepo();
 		this.caseList = FXCollections.observableArrayList(model.getCaseRepo().findAll());
 		this.fxWeaver = fxWeaver;
@@ -254,7 +255,7 @@ public class MainController {
 	private void editCase(ActionEvent actionEvent) {
 		EditCaseController editController = fxWeaver.loadController(EditCaseController.class);
 		editController.setParent(this); // this is needed to refresh main stage TableView after editing
-		editController.show(tableView.getSelectionModel().selectedItemProperty().getValue());
+		editController.show(caseList, tableView.getSelectionModel().selectedItemProperty().getValue());
 	}
 
 	@FXML
@@ -288,22 +289,21 @@ public class MainController {
 		}
 	}
 
+	/**
+	 * this method first requests user on where to save the report file, providing preset directory
+	 * as initial choice. Then it triggers static methods in XLSXFileWriter helper class that return a boolean
+	 * value (true for success, false for failure), depending on latter a correspondent CustomAlert is shown
+	 * @param actionEvent - generated when an appropriate Button is pressesd
+	 */
 	@FXML
 	private void createReport(ActionEvent actionEvent) {
 		DirectoryChooser dialog = new DirectoryChooser();
-		dialog.setInitialDirectory(new File("C:\\Prog\\Java\\Spring\\testdir"));
+		dialog.setInitialDirectory(new File("C:/Prog/Java/Spring/testdir"));
 		File saveDir = dialog.showDialog(stage);
-		boolean reportSaved;
-		try {
-			reportSaved = XLSXFileWriter.createReport(saveDir);
-		} catch (EncryptedDocumentException e) {
-			reportSaved = false;
-			e.printStackTrace();
-		} catch (IOException e) {
-			reportSaved = false;
-			e.printStackTrace();
-		}
-		if (reportSaved) 
+		if (saveDir == null)
+			return;
+		boolean reportSaved = XLSXFileWriter.createReport(saveDir, model, archiveCheckbox.isSelected());
+		if (reportSaved)
 			new CustomAlert("Сохранение отчета", "Отчет сохранен!", "", ButtonType.OK).show();
 		else
 			new CustomAlert("Сохранение отчета", "Не удалось сохранить отчет!", "", ButtonType.CLOSE).show();
@@ -312,11 +312,10 @@ public class MainController {
 //	***************************************************************************
 
 	/**
-	 * loads the main stage with a certain user (aka Representative) modifies
-	 * Archive Button, implementing privilege restrictions for non-admin users to
+	 * loads the main stage with a certain user (aka Representative) 
+	 * modifies Archive Button, enforcing privilege restrictions for non-admin users to
 	 * move and restore cases to/from archive
-	 * 
-	 * @param user the Representative chosen on login stage
+	 * @param user - the Representative chosen on login stage
 	 */
 	public void displayUser(Representative user) {
 		this.user = user;

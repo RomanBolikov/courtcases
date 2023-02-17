@@ -1,4 +1,4 @@
-package mainapp.controllers;
+ package mainapp.controllers;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -9,6 +9,7 @@ import javax.persistence.OptimisticLockException;
 import org.springframework.stereotype.Component;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -28,13 +29,15 @@ import net.rgielen.fxweaver.core.FxmlView;
 @Component
 @FxmlView("editcase.fxml")
 public class EditCaseController extends AbstractCaseController {
-	
+
 	private Stage stage;
 
 	private MainController parent;
+	
+	private ObservableList<ACase> caseList;
 
 	private ACase caseToEdit;
-	
+
 	private final DataModel model;
 
 	public EditCaseController(DataModel model) {
@@ -108,8 +111,8 @@ public class EditCaseController extends AbstractCaseController {
 		if (!courtRepo.existsByName(courtName)) {
 			court = courtRepo.save(court);
 			caseToEdit.setCourt(court);
-		} else if (!courtName.equals(caseToEdit.getCourt().getName())) { 	// if such a court exists in DB then
-			caseToEdit.setCourt(courtRepo.findByName(courtName).get()); 	// we simply set it as case property
+		} else if (!courtName.equals(caseToEdit.getCourt().getName())) { // if such a court exists in DB then
+			caseToEdit.setCourt(courtRepo.findByName(courtName).get()); // we simply set it as case property
 		}
 		if (!caseNoTextField.getText().isEmpty())
 			caseToEdit.setCaseNo(caseNoTextField.getText());
@@ -121,7 +124,8 @@ public class EditCaseController extends AbstractCaseController {
 			try {
 				int hours = Integer.parseInt(hourTextField.getText());
 				int mins = Integer.parseInt(minuteTextField.getText());
-				caseToEdit.setCurrentDate(DatePickerConverter.convertToTimestamp(currDatePicker.getValue(), hours, mins));
+				caseToEdit
+						.setCurrentDate(DatePickerConverter.convertToTimestamp(currDatePicker.getValue(), hours, mins));
 			} catch (NumberFormatException e) {
 				caseToEdit.setCurrentDate(null);
 			}
@@ -138,8 +142,10 @@ public class EditCaseController extends AbstractCaseController {
 		if (!currentState.getText().equals(caseToEdit.getCurrentState()))
 			caseToEdit.setCurrentState(currentState.getText());
 		try {
-			caseToEdit = model.getCaseRepo().save(caseToEdit);
+			ACase updatedCase = model.getCaseRepo().save(caseToEdit);
 			new CustomAlert("Подтверждение", "", "Дело внесено в базу данных!", ButtonType.OK).show();
+			caseList.remove(caseToEdit);
+			caseList.add(updatedCase);
 		} catch (OptimisticLockException ole) {
 			new CustomAlert("Обновление данных", "", "Параметры дела изменены другим пользователем!", ButtonType.OK)
 					.show();
@@ -151,7 +157,8 @@ public class EditCaseController extends AbstractCaseController {
 
 //	***************************************************************************
 
-	public void show(ACase caseToEdit) {
+	public void show(ObservableList<ACase> caseList, ACase caseToEdit) {
+		this.caseList = caseList;
 		this.caseToEdit = caseToEdit;
 		Relation relation = caseToEdit.getRelation();
 		Timestamp timestamp = caseToEdit.getCurrentDate();
