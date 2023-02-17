@@ -3,6 +3,7 @@ package mainapp.data;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -23,11 +24,11 @@ import org.apache.poi.ss.util.CellUtil;
  */
 public class XLSXFileWriter {
 
-	private static final String templatePath = XLSXFileWriter.class.getResource("/mainapp/reportTemplate.xlsx")
-			.getPath();
+	private static final String templatePath = "/mainapp/reportTemplate.xlsx";
 
 	public static boolean createReport(File directory, DataModel model, boolean includeArchive) {
-		try (Workbook wb = WorkbookFactory.create(new File(templatePath))) {
+		try (InputStream is = XLSXFileWriter.class.getResourceAsStream(templatePath);
+			Workbook wb = WorkbookFactory.create(is)) {
 			CellStyle cs = wb.createCellStyle();
 			cs.setWrapText(true);
 			cs.setVerticalAlignment(VerticalAlignment.TOP);
