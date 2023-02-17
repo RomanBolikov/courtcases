@@ -1,5 +1,6 @@
 package mainapp.customGUI;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -37,9 +38,7 @@ public class CustomChoiceDialog extends Dialog<Representative> {
 		this(null);
 	}
 
-	public CustomChoiceDialog(RepresentativeRepo reprRepo) {
-
-		this.reprRepo = reprRepo;
+	public CustomChoiceDialog(List<Representative> list) {
 
 		final DialogPane dialogPane = getDialogPane();
 
@@ -75,7 +74,7 @@ public class CustomChoiceDialog extends Dialog<Representative> {
 
 		comboBox.setMinWidth(MIN_WIDTH);
 
-		comboBox.getItems().addAll(reprRepo.findAll());
+		comboBox.getItems().addAll(list);
 
 		comboBox.setMaxWidth(Double.MAX_VALUE);
 

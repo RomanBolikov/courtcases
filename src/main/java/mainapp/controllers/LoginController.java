@@ -1,6 +1,8 @@
 package mainapp.controllers;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
@@ -64,7 +66,7 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 
 	@FXML
 	private void chooseUser(ActionEvent actionEvent) {
-		choiceDialog = new CustomChoiceDialog(model.getReprRepo());
+		choiceDialog = new CustomChoiceDialog(model.getReprRepo().findAll());
 		DialogPane dp = choiceDialog.getDialogPane();
 		Button okButton = (Button) dp.lookupButton(ButtonType.OK);
 		okButton.setOnAction(this::promptLogin);
@@ -75,7 +77,8 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 
 	@FXML
 	private void loginAsAdmin(ActionEvent actionEvent) {
-		choiceDialog = new CustomChoiceDialog(model.getReprRepo());
+		choiceDialog = new CustomChoiceDialog(
+				model.getReprRepo().findAll().stream().filter(repr -> repr.isAdmin()).collect(Collectors.toList()));
 		DialogPane dp = choiceDialog.getDialogPane();
 		Button okButton = (Button) dp.lookupButton(ButtonType.OK);
 		okButton.setOnAction(this::promptLoginAsAdmin);
