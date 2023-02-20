@@ -144,12 +144,13 @@ public class EditCaseController extends AbstractCaseController {
 		try {
 			ACase updatedCase = model.getCaseRepo().save(caseToEdit);
 			new CustomAlert("Подтверждение", "", "Дело внесено в базу данных!", ButtonType.OK).show();
-			caseList.remove(caseToEdit);
 			caseList.add(updatedCase);
 		} catch (OptimisticLockException ole) {
 			new CustomAlert("Обновление данных", "", "Параметры дела изменены другим пользователем!", ButtonType.OK)
 					.show();
+			caseList.add(model.getCaseRepo().findById(caseToEdit.getId()).get());
 		} finally {
+			caseList.remove(caseToEdit);
 			parent.refreshTable();
 			stage.close();
 		}

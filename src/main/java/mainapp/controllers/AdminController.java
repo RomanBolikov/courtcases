@@ -45,7 +45,7 @@ import net.rgielen.fxweaver.core.FxmlView;
 public class AdminController {
 
 	private CaseRepo caseRepo;
-	
+
 	private RepresentativeRepo reprRepo;
 
 	private ObservableList<Representative> reprList;
@@ -134,7 +134,8 @@ public class AdminController {
 			tableView.refresh();
 			return;
 		}
-		// this part of the method works only for users with admin privileges and sets a password for them
+		// this part of the method works only for users with admin privileges and sets a
+		// password for them
 		Dialog<String> prompt = new PasswordSetDialog();
 		prompt.setHeaderText("Установите пароль");
 		CustomAlert alert = new CustomAlert("Ошибка", "", "Неверный ввод!",
@@ -166,27 +167,28 @@ public class AdminController {
 				new ButtonType("Подтвердить", ButtonData.OK_DONE), new ButtonType("Отменить", ButtonData.CANCEL_CLOSE));
 		Optional<ButtonType> choice = alert.showAndWait();
 		if (choice.isPresent() && choice.get().getButtonData() == ButtonData.OK_DONE) {
-			try {
-				reprRepo.delete(userToDelete);
-				reprList.removeAll(userToDelete);
-				new CustomAlert("Подтверждение", "Пользователь " + userToDelete + " удален!", "", ButtonType.OK).show();
-			} catch (OptimisticLockException ole) {
-				new CustomAlert("Обновление данных", "", "Пользователь уже удален!", ButtonType.OK).show();
-			}
-			for (ACase acase: caseRepo.findByRepr(userToDelete)) {
+			for (ACase acase : caseRepo.findByRepr(userToDelete)) {
 				try {
 					acase.setRepr(null);
 					caseRepo.save(acase);
-				} catch (OptimisticLockException ole) {
-					new CustomAlert("Обновление данных", "", "Произошла ошибка!", ButtonType.OK).show();
+				} catch (OptimisticLockException ignored) {
 				}
-			tableView.refresh();
+			try {
+				reprRepo.delete(userToDelete);
+				new CustomAlert("Подтверждение", "Пользователь " + userToDelete + " удален!", "", ButtonType.OK).show();
+			} catch (OptimisticLockException ole) {
+				new CustomAlert("Обновление данных", "", "Пользователь уже удален!", ButtonType.OK).show();
+			} finally {
+				reprList.remove(userToDelete);
+			}
+				tableView.refresh();
 			}
 		}
 	}
 
 	/**
 	 * this method simply reverts the view back to login
+	 * 
 	 * @param actionEvent - a mouse click on a corresponding button
 	 */
 	@FXML
