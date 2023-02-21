@@ -106,7 +106,7 @@
             <Insets />
          </GridPane.margin>
       </HBox>
-      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.rowIndex="1">
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.columnSpan="2" GridPane.rowIndex="1">
          <children>
             <CheckBox fx:id="archiveCheckbox" alignment="CENTER" mnemonicParsing="false" text="Показать архивные дела" textAlignment="CENTER" wrapText="true">
                <font>
@@ -118,15 +118,7 @@
             </CheckBox>
          </children>
       </VBox>
-      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-         <children>
-            <Button fx:id="refreshButton" alignment="CENTER" mnemonicParsing="false" onAction="#refreshTable" prefHeight="50.0" prefWidth="87.0" text="Обновить таблицу" textAlignment="CENTER" wrapText="true">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Button>
-         </children>
-      </VBox>
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       <TableView fx:id="tableView" style="-fx-selection-bar: #E1E1E1;" GridPane.columnSpan="4" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="courtColumn" text="Суд" />

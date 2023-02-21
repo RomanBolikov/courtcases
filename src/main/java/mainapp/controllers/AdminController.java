@@ -171,18 +171,18 @@ public class AdminController {
 				try {
 					acase.setRepr(null);
 					caseRepo.save(acase);
-				} catch (OptimisticLockException ignored) {
-				}
+				} catch (OptimisticLockException ignored) {}
+			}	
 			try {
 				reprRepo.delete(userToDelete);
-				new CustomAlert("Подтверждение", "Пользователь " + userToDelete + " удален!", "", ButtonType.OK).show();
+				new CustomAlert("Подтверждение", "Пользователь " + userToDelete + " удален!", "", ButtonType.OK)
+						.show();
 			} catch (OptimisticLockException ole) {
 				new CustomAlert("Обновление данных", "", "Пользователь уже удален!", ButtonType.OK).show();
 			} finally {
 				reprList.remove(userToDelete);
 			}
-				tableView.refresh();
-			}
+			tableView.refresh();
 		}
 	}
 

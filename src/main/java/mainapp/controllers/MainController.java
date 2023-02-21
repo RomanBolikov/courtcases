@@ -51,7 +51,7 @@ import net.rgielen.fxweaver.core.FxmlView;
 public class MainController {
 
 	private final DataModel model;
-	
+
 	private final CaseRepo caseRepo;
 
 	private ObservableList<ACase> caseList;
@@ -135,9 +135,6 @@ public class MainController {
 	private CheckBox archiveCheckbox;
 
 	@FXML
-	private Button refreshButton;
-
-	@FXML
 	private Button createReportButton;
 
 //  *********************************************
@@ -177,10 +174,14 @@ public class MainController {
 							setText(null);
 							setGraphic(null);
 							setStyle("");
-						} else if (!item.isEmpty() && !item.equals("не назначено")) {
-							DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-							LocalDateTime datetime = LocalDateTime.parse(item, formatter);
-							setTextFill(datetime.isBefore(LocalDateTime.now()) ? Color.RED : Color.BLACK);
+						} else if (!item.isEmpty()) {
+							if (item.equals("не назначено"))
+								setTextFill(Color.BLUE);
+							else {
+								DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+								LocalDateTime datetime = LocalDateTime.parse(item, formatter);
+								setTextFill(datetime.isBefore(LocalDateTime.now()) ? Color.RED : Color.BLACK);
+							}
 						}
 					}
 				};
@@ -198,12 +199,12 @@ public class MainController {
 				@Override
 				protected void updateItem(ACase item, boolean empty) {
 					super.updateItem(item, empty);
-					if (empty || item == null)
+					if (empty || item == null) {
 						setStyle("");
-					else {
-						for (int i = 0; i < getChildren().size() - 1; i++) {
-							((Labeled) getChildren().get(i)).setTextFill(item.isArchive() ? Color.GREEN : Color.BLACK);
-						}
+						setGraphic(null);
+					} else {
+						for (int i = 0; i < getChildren().size() - 1; i++)
+							((Labeled) getChildren().get(i)).setTextFill(item.isArchive() ? Color.GREEN : Color.BLACK);						
 					}
 				}
 			};
@@ -215,7 +216,6 @@ public class MainController {
 		});
 		tableView.getSelectionModel().selectedItemProperty().addListener(this::enableEditButton);
 		archiveCheckbox.selectedProperty().addListener((obs, oldVal, newVal) -> refreshTable());
-		refreshButton.setOnAction(evt -> tableView.refresh());
 	}
 
 	@FXML
@@ -253,9 +253,12 @@ public class MainController {
 
 	@FXML
 	private void editCase(ActionEvent actionEvent) {
+		ACase caseToEdit = tableView.getSelectionModel().selectedItemProperty().getValue();
+		if (caseToEdit == null) 	// if an empty row is double-clicked accidentally or intentionally
+			return;					// methods returns with no actions taken
 		EditCaseController editController = fxWeaver.loadController(EditCaseController.class);
 		editController.setParent(this); // this is needed to refresh main stage TableView after editing
-		editController.show(caseList, tableView.getSelectionModel().selectedItemProperty().getValue());
+		editController.show(caseList, caseToEdit);
 	}
 
 	@FXML
@@ -290,9 +293,11 @@ public class MainController {
 	}
 
 	/**
-	 * this method first requests user on where to save the report file, providing preset directory
-	 * as initial choice. Then it triggers static methods in XLSXFileWriter helper class that return a boolean
-	 * value (true for success, false for failure), depending on latter a correspondent CustomAlert is shown
+	 * this method first requests user on where to save the report file, providing
+	 * preset directory as initial choice. Then it triggers static methods in
+	 * XLSXFileWriter helper class that return a boolean value (true for success,
+	 * false for failure), depending on latter a correspondent CustomAlert is shown
+	 * 
 	 * @param actionEvent - generated when an appropriate Button is pressesd
 	 */
 	@FXML
@@ -312,9 +317,10 @@ public class MainController {
 //	***************************************************************************
 
 	/**
-	 * loads the main stage with a certain user (aka Representative) 
-	 * modifies Archive Button, enforcing privilege restrictions for non-admin users to
-	 * move and restore cases to/from archive
+	 * loads the main stage with a certain user (aka Representative) modifies
+	 * Archive Button, enforcing privilege restrictions for non-admin users to move
+	 * and restore cases to/from archive
+	 * 
 	 * @param user - the Representative chosen on login stage
 	 */
 	public void displayUser(Representative user) {
