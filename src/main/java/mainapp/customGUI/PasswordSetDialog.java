@@ -50,8 +50,9 @@ public class PasswordSetDialog extends Dialog<String> {
 		updateGrid();
 		setResultConverter((dialogButton) -> {
 			ButtonData data = dialogButton == null ? null : dialogButton.getButtonData();
-			if (data == null || data == ButtonData.CANCEL_CLOSE)
+			if (data == null || data == ButtonData.CANCEL_CLOSE) {
 				return null;
+			}
 			String input1 = newPasswordField.getText(), input2 = retypePasswordField.getText();
 			return !input1.isEmpty() && input1.equals(input2) ? input1 : "invalid";
 		});

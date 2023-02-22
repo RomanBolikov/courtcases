@@ -20,13 +20,13 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import mainapp.customGUI.CustomAlert;
@@ -105,6 +105,7 @@ public class AdminController {
 			editUserButton.setDisable(newVal == null ? true : false);
 			deleteUserButton.setDisable(newVal == null ? true : false);
 		});
+		reprList.sort((r1, r2) -> r1.getName().compareTo(r2.getName()));
 		tableView.setItems(reprList);
 	}
 
@@ -123,8 +124,7 @@ public class AdminController {
 	private void editUser(ActionEvent actionEvent) {
 		Representative userToEdit = tableView.getSelectionModel().selectedItemProperty().getValue();
 		Pair<String, Boolean> result = fxWeaver.loadController(EditUserController.class).showAndWait(userToEdit);
-		if (result == null)
-			return;
+		if (result == null) return;
 		userToEdit.setName(result.getFirst());
 		userToEdit.setIsAdmin(result.getSecond());
 		if (!userToEdit.isAdmin()) {
@@ -151,11 +151,9 @@ public class AdminController {
 					break;
 				} else {
 					Optional<ButtonType> retry = alert.showAndWait();
-					if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE)
-						break;
+					if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE) break;
 				}
-			} else
-				break;
+			} else break;
 		}
 	}
 
@@ -171,12 +169,12 @@ public class AdminController {
 				try {
 					acase.setRepr(null);
 					caseRepo.save(acase);
-				} catch (OptimisticLockException ignored) {}
-			}	
+				} catch (OptimisticLockException ignored) {
+				}
+			}
 			try {
 				reprRepo.delete(userToDelete);
-				new CustomAlert("Подтверждение", "Пользователь " + userToDelete + " удален!", "", ButtonType.OK)
-						.show();
+				new CustomAlert("Подтверждение", "Пользователь " + userToDelete + " удален!", "", ButtonType.OK).show();
 			} catch (OptimisticLockException ole) {
 				new CustomAlert("Обновление данных", "", "Пользователь уже удален!", ButtonType.OK).show();
 			} finally {

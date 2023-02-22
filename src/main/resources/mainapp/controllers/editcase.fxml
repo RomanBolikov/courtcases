@@ -151,7 +151,7 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>
          <children>
-            <Label prefHeight="20.0" text="Истец (заявитель) (макс. 200 знаков):" textFill="#dc0d0d">
+            <Label prefHeight="20.0" text="Истец (заявитель) (макс. 200 знаков):">
                <font>
                   <Font name="Arial Unicode MS" size="14.0" />
                </font>
@@ -163,7 +163,7 @@
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </padding>
          <children>
-            <Label prefHeight="20.0" text="Ответчик (заинт. лицо) (макс. 200 знаков):" textFill="#dc0d0d">
+            <Label prefHeight="20.0" text="Ответчик (заинт. лицо) (макс. 200 знаков):">
                <font>
                   <Font name="Arial Unicode MS" size="14.0" />
                </font>

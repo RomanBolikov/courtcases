@@ -38,15 +38,14 @@ public class XLSXFileWriter {
 			List<ACase> list1 = model.getCaseRepo().findByRelation(relation1);
 			for (int i = 0, currRow = 2; i < list1.size(); i++) {
 				ACase acase = list1.get(i);
-				if (!includeArchive && acase.isArchive())
-					continue;
+				if (!includeArchive && acase.isArchive()) continue;
 				Row row = sheet1.createRow(currRow);
 				CellUtil.createCell(row, 0, String.valueOf(currRow - 1), cs);
-				CellUtil.createCell(row, 1, acase.getDefendant(), cs);
+				CellUtil.createCell(row, 1, acase.getDefendant() == null ? "" : acase.getDefendant(), cs);
 				CellUtil.createCell(row, 2, String.format("%s\r\n%s", acase.getCourt().toString(),
 						acase.getCaseNo() == null ? "" : acase.getCaseNo()), cs);
 				CellUtil.createCell(row, 3, acase.getTitle(), cs);
-				CellUtil.createCell(row, 4, acase.getRepr().toString(), cs);
+				CellUtil.createCell(row, 4, acase.getRepr() == null ? "" : acase.getRepr().toString(), cs);
 				CellUtil.createCell(row, 5, acase.getStage().toString(), cs);
 				Cell cell7 = formLastCell(acase, row, 6);
 				cell7.setCellStyle(cs);
@@ -58,15 +57,14 @@ public class XLSXFileWriter {
 			List<ACase> list2 = model.getCaseRepo().findByRelation(relation2);
 			for (int i = 0, currRow = 2; i < list2.size(); i++) {
 				ACase acase = list2.get(i);
-				if (!includeArchive && acase.isArchive())
-					continue;
+				if (!includeArchive && acase.isArchive()) continue;
 				Row row = sheet2.createRow(currRow);
 				CellUtil.createCell(row, 0, String.valueOf(currRow - 1), cs);
-				CellUtil.createCell(row, 1, acase.getPlaintiff(), cs);
+				CellUtil.createCell(row, 1, acase.getPlaintiff() == null ? "" : acase.getPlaintiff(), cs);
 				CellUtil.createCell(row, 2, String.format("%s\r\n%s", acase.getCourt().toString(),
 						acase.getCaseNo() == null ? "" : acase.getCaseNo()), cs);
 				CellUtil.createCell(row, 3, acase.getTitle(), cs);
-				CellUtil.createCell(row, 4, acase.getRepr().toString(), cs);
+				CellUtil.createCell(row, 4, acase.getRepr() == null ? "" : acase.getRepr().toString(), cs);
 				CellUtil.createCell(row, 5, acase.getStage().toString(), cs);
 				Cell cell7 = formLastCell(acase, row, 6);
 				cell7.setCellStyle(cs);
@@ -78,16 +76,15 @@ public class XLSXFileWriter {
 			List<ACase> list3 = model.getCaseRepo().findByRelation(relation3);
 			for (int i = 0, currRow = 2; i < list3.size(); i++) {
 				ACase acase = list3.get(i);
-				if (!includeArchive && acase.isArchive())
-					continue;
+				if (!includeArchive && acase.isArchive()) continue;
 				Row row = sheet3.createRow(currRow);
 				CellUtil.createCell(row, 0, String.valueOf(currRow - 1), cs);
-				CellUtil.createCell(row, 1, acase.getPlaintiff(), cs);
-				CellUtil.createCell(row, 2, acase.getDefendant(), cs);
+				CellUtil.createCell(row, 1, acase.getPlaintiff() == null ? "" : acase.getPlaintiff(), cs);
+				CellUtil.createCell(row, 2, acase.getDefendant() == null ? "" : acase.getDefendant(), cs);
 				CellUtil.createCell(row, 3, String.format("%s\r\n%s", acase.getCourt().toString(),
 						acase.getCaseNo() == null ? "" : acase.getCaseNo()), cs);
 				CellUtil.createCell(row, 4, acase.getTitle(), cs);
-				CellUtil.createCell(row, 5, acase.getRepr().toString(), cs);
+				CellUtil.createCell(row, 5, acase.getRepr() == null ? "" : acase.getRepr().toString(), cs);
 				CellUtil.createCell(row, 6, acase.getStage().toString(), cs);
 				Cell cell8 = formLastCell(acase, row, 7);
 				cell8.setCellStyle(cs);
@@ -99,15 +96,14 @@ public class XLSXFileWriter {
 			List<ACase> list4 = model.getCaseRepo().findByRelation(relation4);
 			for (int i = 0, currRow = 2; i < list4.size(); i++) {
 				ACase acase = list4.get(i);
-				if (!includeArchive && acase.isArchive())
-					continue;
+				if (!includeArchive && acase.isArchive()) continue;
 				Row row = sheet4.createRow(currRow);
 				CellUtil.createCell(row, 0, String.valueOf(currRow - 1), cs);
-				CellUtil.createCell(row, 1, acase.getDefendant(), cs);
+				CellUtil.createCell(row, 1, acase.getDefendant() == null ? "" : acase.getDefendant(), cs);
 				CellUtil.createCell(row, 2, String.format("%s\r\n%s", acase.getCourt().toString(),
 						acase.getCaseNo() == null ? "" : acase.getCaseNo()), cs);
 				CellUtil.createCell(row, 3, acase.getTitle(), cs);
-				CellUtil.createCell(row, 4, acase.getRepr().toString(), cs);
+				CellUtil.createCell(row, 4, acase.getRepr() == null ? "" : acase.getRepr().toString(), cs);
 				CellUtil.createCell(row, 5, acase.getStage().toString(), cs);
 				Cell cell7 = formLastCell(acase, row, 6);
 				cell7.setCellStyle(cs);
@@ -119,16 +115,15 @@ public class XLSXFileWriter {
 			List<ACase> list5 = model.getCaseRepo().findByRelation(relation5);
 			for (int i = 0, currRow = 2; i < list5.size(); i++) {
 				ACase acase = list5.get(i);
-				if (!includeArchive && acase.isArchive())
-					continue;
+				if (!includeArchive && acase.isArchive()) continue;
 				Row row = sheet5.createRow(currRow);
 				CellUtil.createCell(row, 0, String.valueOf(currRow - 1), cs);
-				CellUtil.createCell(row, 1, acase.getPlaintiff(), cs);
-				CellUtil.createCell(row, 2, acase.getDefendant(), cs);
+				CellUtil.createCell(row, 1, acase.getPlaintiff() == null ? "" : acase.getPlaintiff(), cs);
+				CellUtil.createCell(row, 2, acase.getDefendant() == null ? "" : acase.getDefendant(), cs);
 				CellUtil.createCell(row, 3, String.format("%s\r\n%s", acase.getCourt().toString(),
 						acase.getCaseNo() == null ? "" : acase.getCaseNo()), cs);
 				CellUtil.createCell(row, 4, acase.getTitle(), cs);
-				CellUtil.createCell(row, 5, acase.getRepr().toString(), cs);
+				CellUtil.createCell(row, 5, acase.getRepr() == null ? "" : acase.getRepr().toString(), cs);
 				CellUtil.createCell(row, 6, acase.getStage().toString(), cs);
 				Cell cell8 = formLastCell(acase, row, 7);
 				cell8.setCellStyle(cs);
@@ -144,12 +139,12 @@ public class XLSXFileWriter {
 	private static Cell formLastCell(ACase acase, Row row, int columnIndex) {
 		Cell cell = row.createCell(columnIndex);
 		LocalDate date = DatePickerConverter.extractLocalDate(acase.getCurrentDate());
-		if (date == null)
+		if (date == null) {
 			cell.setCellValue(acase.getCurrentState());
-		else {
+		} else {
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 			String dateString = dtf.format(date);
-			cell.setCellValue(String.format("%s\r\n%s", dateString, acase.getCurrentState()));
+			cell.setCellValue(dateString + "\n" + acase.getCurrentState());
 		}
 		return cell;
 	}

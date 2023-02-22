@@ -78,7 +78,9 @@ public class FilterController {
 		List<String> relationList = model.getRelationRepo().findAll().stream().map(rel -> rel.toString())
 				.collect(Collectors.toList());
 		relationChoiceBox.setItems(FXCollections.observableArrayList(relationList));
-		List<String> reprList = model.getReprRepo().findAll().stream().map(repr -> repr.toString())
+		List<String> reprList = model.getReprRepo().findAll().stream()
+				.map(repr -> repr.toString())
+				.sorted()
 				.collect(Collectors.toList());
 		representativeChoiceBox.setItems(FXCollections.observableArrayList(reprList));
 		List<String> courtList = model.getCourtRepo().findAll().stream().map(court -> court.toString())

@@ -42,9 +42,9 @@ public class EditUserController extends AbstractUserController {
 	public void saveUser(ActionEvent actionEvent) {
 		String input = textField.getText();
 		boolean selectedStatus = checkBox.isSelected();
-		if (!validate(input))
+		if (!validate(input)) {
 			new CustomAlert("Ошибка ввода", "", "Проверьте ввод Ф.И.О. сотрудника!", ButtonType.OK).show();
-		else {
+		} else {
 			if (!input.equals(name) || selectedStatus != status) {
 				unchanged = false;
 				name = input;
@@ -59,8 +59,9 @@ public class EditUserController extends AbstractUserController {
 		textField.setText(userToEdit.getName());
 		checkBox.setSelected(userToEdit.isAdmin() ? true : false);
 		stage.showAndWait();
-		if (unchanged)
+		if (unchanged) {
 			return null;
+		}
 		return Pair.of(name, status);
 	}
 }

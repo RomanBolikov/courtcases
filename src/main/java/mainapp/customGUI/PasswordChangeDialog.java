@@ -60,11 +60,13 @@ public class PasswordChangeDialog extends Dialog<String> {
 		updateGrid();
 		setResultConverter((dialogButton) -> {
 			ButtonData data = dialogButton == null ? null : dialogButton.getButtonData();
-			if (data == null || data == ButtonData.CANCEL_CLOSE)
+			if (data == null || data == ButtonData.CANCEL_CLOSE) {
 				return null;
+			}
 			String input1 = oldPasswordField.getText();
-			if (!BCrypt.checkpw(input1, oldPassword))
+			if (!BCrypt.checkpw(input1, oldPassword)) {
 				return "invalid";
+			}
 			String input2 = newPasswordField.getText(), input3 = retypePasswordField.getText();
 			return input2.equals(input3) ? input2 : "invalid";
 		});

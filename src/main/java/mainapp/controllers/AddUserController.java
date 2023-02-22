@@ -38,9 +38,9 @@ public class AddUserController extends AbstractUserController {
 	@FXML
 	public void saveUser(ActionEvent actionEvent) {
 		String input = textField.getText();
-		if (!validate(input))
+		if (!validate(input)) {
 			new CustomAlert("Ошибка ввода", "", "Проверьте ввод Ф.И.О. сотрудника!", ButtonType.OK).show();
-		else {
+		} else {
 			newUser = new Representative(input);
 			newUser.setIsAdmin(checkBox.isSelected() ? true : false);
 			if (newUser.isAdmin()) {

@@ -96,7 +96,6 @@ public abstract class AbstractCaseController {
 	protected boolean isInputCorrect() {
 		return relationChoiceBox.getValue() != null && caseTypeChoiceBox.getValue() != null
 				&& !description.getText().isEmpty() && courtComboBox.getValue() != null
-				&& !plaintiffTextField.getText().isEmpty() && !defendantTextField.getText().isEmpty()
 				&& stageChoiceBox.getValue() != null && !currentState.getText().isEmpty();
 	}
 

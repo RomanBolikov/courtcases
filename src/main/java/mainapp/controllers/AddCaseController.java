@@ -1,6 +1,5 @@
 package mainapp.controllers;
 
-
 import org.springframework.stereotype.Component;
 
 import javafx.collections.FXCollections;
@@ -23,7 +22,7 @@ import net.rgielen.fxweaver.core.FxmlView;
 @Component
 @FxmlView("addcase.fxml")
 public class AddCaseController extends AbstractCaseController {
-	
+
 	private Stage stage;
 
 	private ObservableList<ACase> caseList;
@@ -50,8 +49,9 @@ public class AddCaseController extends AbstractCaseController {
 		courtComboBox.setConverter(new StringConverter<Court>() {
 			@Override
 			public String toString(Court court) {
-				if (court == null)
+				if (court == null) {
 					return "";
+				}
 				return court.getName();
 			}
 
@@ -85,7 +85,7 @@ public class AddCaseController extends AbstractCaseController {
 
 		defendantTextField.setTextFormatter(
 				new TextFormatter<String>(change -> change.getControlNewText().length() <= 200 ? change : null));
-		
+
 		// limit input into TextAreas to 300 characters
 		description.setTextFormatter(
 				new TextFormatter<String>(change -> change.getControlNewText().length() <= 300 ? change : null));
@@ -101,17 +101,25 @@ public class AddCaseController extends AbstractCaseController {
 			displayErrors();
 		} else {
 			Court court = courtComboBox.getValue();
-			if (model.getCourtRepo().existsByName(court.getName()))
+			if (model.getCourtRepo().existsByName(court.getName())) {
 				court = model.getCourtRepo().findByName(court.getName()).get();
-			else
+			} else {
 				court = model.getCourtRepo().save(court);
+			}
 			ACase newCase = new ACase(relationChoiceBox.getValue(), caseTypeChoiceBox.getValue(), description.getText(),
-					court, plaintiffTextField.getText(), defendantTextField.getText(), stageChoiceBox.getValue(),
-					currentState.getText());
-			if (!caseNoTextField.getText().isEmpty())
+					court, stageChoiceBox.getValue(), currentState.getText());
+			if (!caseNoTextField.getText().isEmpty()) {
 				newCase.setCaseNo(caseNoTextField.getText());
-			if (representativeChoiceBox.getValue() != null)
+			}
+			if (!plaintiffTextField.getText().isEmpty()) {
+				newCase.setPlaintiff(plaintiffTextField.getText());
+			}
+			if (!defendantTextField.getText().isEmpty()) {
+				newCase.setDefendant(defendantTextField.getText());
+			}
+			if (representativeChoiceBox.getValue() != null) {
 				newCase.setRepr(representativeChoiceBox.getValue());
+			}
 			if (currDatePicker.getValue() != null && !hourTextField.getText().isEmpty()
 					&& !minuteTextField.getText().isEmpty()) {
 				try {
@@ -135,8 +143,9 @@ public class AddCaseController extends AbstractCaseController {
 	public void show(ObservableList<ACase> caseList, Representative user) {
 		this.caseList = caseList;
 		representativeChoiceBox.setValue(user);
-		if (!user.isAdmin())
+		if (!user.isAdmin()) {
 			representativeChoiceBox.setDisable(true);
+		}
 		stage.show();
 	}
 }

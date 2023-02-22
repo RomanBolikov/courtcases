@@ -73,6 +73,8 @@ public class CustomChoiceDialog extends Dialog<Representative> {
 		comboBox = new ComboBox<Representative>();
 
 		comboBox.setMinWidth(MIN_WIDTH);
+		
+		list.sort((r1, r2) -> r1.getName().compareTo(r2.getName()));
 
 		comboBox.getItems().addAll(list);
 
@@ -117,7 +119,6 @@ public class CustomChoiceDialog extends Dialog<Representative> {
 		grid.add(comboBox, 1, 0);
 		grid.add(changePasswordButton, 2, 0);
 		getDialogPane().setContent(grid);
-
 		Platform.runLater(() -> comboBox.requestFocus());
 	}
 
@@ -139,8 +140,7 @@ public class CustomChoiceDialog extends Dialog<Representative> {
 					break;
 				} else {
 					Optional<ButtonType> retry = alert.showAndWait();
-					if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE)
-						break;
+					if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE) break;
 				} 
 			} else break;
 		}

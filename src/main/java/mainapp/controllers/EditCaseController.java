@@ -2,7 +2,6 @@
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.Optional;
 
 import javax.persistence.OptimisticLockException;
 
@@ -61,8 +60,9 @@ public class EditCaseController extends AbstractCaseController {
 		courtComboBox.setConverter(new StringConverter<Court>() {
 			@Override
 			public String toString(Court court) {
-				if (court == null)
+				if (court == null) {
 					return "";
+				}
 				return court.getName();
 			}
 
@@ -83,7 +83,7 @@ public class EditCaseController extends AbstractCaseController {
 
 		minuteTextField.focusedProperty().addListener((obs, oldValue, newValue) -> {
 			if (!newValue) {
-				if (!minuteTextField.getText().matches("[0-6][05]")) {
+				if (!minuteTextField.getText().matches("[0-5][05]")) {
 					minuteTextField.setText("");
 					new CustomAlert("Ошибка ввода", "", "Неверный ввод в поле \"минуты\"", ButtonType.OK).show();
 				}
@@ -114,11 +114,13 @@ public class EditCaseController extends AbstractCaseController {
 		} else if (!courtName.equals(caseToEdit.getCourt().getName())) { // if such a court exists in DB then
 			caseToEdit.setCourt(courtRepo.findByName(courtName).get()); // we simply set it as case property
 		}
-		if (!caseNoTextField.getText().isEmpty())
+		if (!caseNoTextField.getText().isEmpty()) {
 			caseToEdit.setCaseNo(caseNoTextField.getText());
+		}
 		String repr = representativeChoiceBox.getValue().getName();
-		if (!repr.equals(caseToEdit.getRepr().getName()))
+		if (!repr.equals(caseToEdit.getRepr().getName())) {
 			caseToEdit.setRepr(model.getReprRepo().findByName(repr));
+		}
 		if (currDatePicker.getValue() != null && !hourTextField.getText().isEmpty()
 				&& !minuteTextField.getText().isEmpty()) {
 			try {
@@ -129,18 +131,24 @@ public class EditCaseController extends AbstractCaseController {
 			} catch (NumberFormatException e) {
 				caseToEdit.setCurrentDate(null);
 			}
-		} else
+		} else {
 			caseToEdit.setCurrentDate(null);
-		if (!description.getText().equals(caseToEdit.getTitle()))
+		}
+		if (!description.getText().equals(caseToEdit.getTitle())) {
 			caseToEdit.setTitle(description.getText());
-		if (!caseNoTextField.getText().equals(caseToEdit.getCaseNo()))
+		}
+		if (!caseNoTextField.getText().equals(caseToEdit.getCaseNo())) {
 			caseToEdit.setCaseNo(caseNoTextField.getText());
-		if (!plaintiffTextField.getText().equals(caseToEdit.getPlaintiff()))
+		}
+		if (!plaintiffTextField.getText().equals(caseToEdit.getPlaintiff())) {
 			caseToEdit.setPlaintiff(plaintiffTextField.getText());
-		if (!defendantTextField.getText().equals(caseToEdit.getDefendant()))
+		}
+		if (!defendantTextField.getText().equals(caseToEdit.getDefendant())) {
 			caseToEdit.setDefendant(defendantTextField.getText());
-		if (!currentState.getText().equals(caseToEdit.getCurrentState()))
+		}
+		if (!currentState.getText().equals(caseToEdit.getCurrentState())) {
 			caseToEdit.setCurrentState(currentState.getText());
+		}
 		try {
 			ACase updatedCase = model.getCaseRepo().save(caseToEdit);
 			new CustomAlert("Подтверждение", "", "Дело внесено в базу данных!", ButtonType.OK).show();
@@ -178,9 +186,10 @@ public class EditCaseController extends AbstractCaseController {
 		description.setText(caseToEdit.getTitle());
 		currentState.setText(caseToEdit.getCurrentState());
 		currDatePicker.setValue(date);
-		if (date != null)
+		if (date != null) {
 			currDatePicker.getEditor()
 					.setStyle(date.isBefore(LocalDate.now()) ? "-fx-text-fill: red" : "-fx-text-fill: black");
+		}
 		if (time.length > 1) {
 			hourTextField.setText(String.format("%02d", time[0]));
 			minuteTextField.setText(String.format("%02d", time[1]));
@@ -194,11 +203,11 @@ public class EditCaseController extends AbstractCaseController {
 		stageChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setStage(newVal));
 		courtComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
 			Court court = newVal;
-			Optional<Court> courtInDB = model.getCourtRepo().findByName(court.getName());
-			if (courtInDB.isPresent())
-				court = courtInDB.get();
-			else
+			if (model.getCourtRepo().existsByName(court.getName())) {
+				court = model.getCourtRepo().findByName(court.getName()).get();
+			} else {
 				court = model.getCourtRepo().save(court);
+			}
 			caseToEdit.setCourt(court);
 		});
 		currDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> {

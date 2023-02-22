@@ -145,17 +145,38 @@ public class MainController {
 	public void initialize() {
 		titleColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getTitle()));
 		courtColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getCourt().toString()));
-		numberColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getCaseNo()));
-		plaintiffColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getPlaintiff()));
-		defendantColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getDefendant()));
-		reprColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getRepr().toString()));
+		numberColumn.setCellValueFactory(cdf -> {
+			SimpleStringProperty property = new SimpleStringProperty();
+			String caseNo = cdf.getValue().getCaseNo();
+			property.setValue(caseNo == null ? "" : caseNo);
+			return property;
+		});
+		plaintiffColumn.setCellValueFactory(cdf -> {
+			SimpleStringProperty property = new SimpleStringProperty();
+			String plaintiff = cdf.getValue().getPlaintiff();
+			property.setValue(plaintiff == null ? "" : plaintiff);
+			return property;
+		});
+		defendantColumn.setCellValueFactory(cdf -> {
+			SimpleStringProperty property = new SimpleStringProperty();
+			String defendant = cdf.getValue().getDefendant();
+			property.setValue(defendant == null ? "" : defendant);
+			return property;
+		});
+		reprColumn.setCellValueFactory(cdf -> {
+			if (cdf.getValue().getRepr() == null) {
+				return new SimpleStringProperty("");
+			}
+			String repr = cdf.getValue().getRepr().toString();
+			return new SimpleStringProperty(repr);
+		});
 		dateColumn.setCellValueFactory(cdf -> {
 			SimpleStringProperty property = new SimpleStringProperty();
 			ACase thisCase = cdf.getValue();
 			Timestamp date = thisCase.getCurrentDate();
-			if (date == null)
+			if (date == null) {
 				property.setValue(thisCase.isArchive() ? "" : "не назначено");
-			else {
+			} else {
 				LocalDateTime datetime = date.toLocalDateTime();
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 				property.setValue(formatter.format(datetime));
@@ -175,9 +196,9 @@ public class MainController {
 							setGraphic(null);
 							setStyle("");
 						} else if (!item.isEmpty()) {
-							if (item.equals("не назначено"))
+							if (item.equals("не назначено")) {
 								setTextFill(Color.BLUE);
-							else {
+							} else {
 								DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 								LocalDateTime datetime = LocalDateTime.parse(item, formatter);
 								setTextFill(datetime.isBefore(LocalDateTime.now()) ? Color.RED : Color.BLACK);
@@ -186,8 +207,9 @@ public class MainController {
 					}
 				};
 				cell.itemProperty().addListener((obs, oldVal, newVal) -> {
-					if (newVal != null)
+					if (newVal != null) {
 						cell.setText(newVal);
+					}
 				});
 				return cell;
 			};
@@ -203,14 +225,16 @@ public class MainController {
 						setStyle("");
 						setGraphic(null);
 					} else {
-						for (int i = 0; i < getChildren().size() - 1; i++)
-							((Labeled) getChildren().get(i)).setTextFill(item.isArchive() ? Color.GREEN : Color.BLACK);						
+						for (int i = 0; i < getChildren().size() - 1; i++) {
+							((Labeled) getChildren().get(i)).setTextFill(item.isArchive() ? Color.GREEN : Color.BLACK);
+						}
 					}
 				}
 			};
 			row.setOnMouseClicked(evt -> {
-				if (evt.getButton().equals(MouseButton.PRIMARY) && evt.getClickCount() == 2)
+				if (evt.getButton().equals(MouseButton.PRIMARY) && evt.getClickCount() == 2) {
 					editCase(new ActionEvent());
+				}
 			});
 			return row;
 		});
@@ -254,8 +278,14 @@ public class MainController {
 	@FXML
 	private void editCase(ActionEvent actionEvent) {
 		ACase caseToEdit = tableView.getSelectionModel().selectedItemProperty().getValue();
-		if (caseToEdit == null) 	// if an empty row is double-clicked accidentally or intentionally
-			return;					// methods returns with no actions taken
+		// this check is needed in case if an empty row is double-clicked accidentally or intentionally
+		if (caseToEdit == null) return;
+		if (caseToEdit.isArchive()) {
+			new CustomAlert("Редактирование дела",
+					"Для редактирования дела необходимо" + "\n" + "восстановить его из архива!", "", ButtonType.OK)
+					.show();
+			return;
+		}
 		EditCaseController editController = fxWeaver.loadController(EditCaseController.class);
 		editController.setParent(this); // this is needed to refresh main stage TableView after editing
 		editController.show(caseList, caseToEdit);
@@ -266,15 +296,19 @@ public class MainController {
 		Optional<ButtonType> confirmed = new CustomAlert("Подтверждение", "Переместить дело в архив?", "",
 				ButtonType.OK, new ButtonType("Отмена", ButtonData.CANCEL_CLOSE)).showAndWait();
 		if (confirmed.isPresent() && confirmed.get() == ButtonType.OK) {
-			ACase acase = tableView.getSelectionModel().getSelectedItem();
-			acase.setIsArchive(true);
-			acase.setCurrentDate(null);
+			ACase caseToBeMoved = tableView.getSelectionModel().getSelectedItem();
+			caseToBeMoved.setIsArchive(true);
+			caseToBeMoved.setCurrentDate(null);
 			try {
-				caseRepo.save(acase);
+				ACase edited = caseRepo.save(caseToBeMoved);
+				caseList.add(edited);
+				new CustomAlert("Перемещение в архив", "", "Дело перемещено в архив!", ButtonType.OK).show();
 			} catch (OptimisticLockException ole) {
 				new CustomAlert("Обновление данных", "", "Параметры дела изменены другим пользователем!", ButtonType.OK)
 						.show();
+				caseList.add(caseRepo.findById(caseToBeMoved.getId()).get());
 			} finally {
+				caseList.remove(caseToBeMoved);
 				refreshTable();
 			}
 		}
@@ -285,10 +319,19 @@ public class MainController {
 		Optional<ButtonType> confirmed = new CustomAlert("Подтверждение", "Восстановить дело из архива?", "",
 				ButtonType.OK, new ButtonType("Отмена", ButtonData.CANCEL_CLOSE)).showAndWait();
 		if (confirmed.isPresent() && confirmed.get() == ButtonType.OK) {
-			ACase acase = tableView.getSelectionModel().getSelectedItem();
-			acase.setIsArchive(false);
-			caseRepo.save(acase);
-			refreshTable();
+			ACase caseToRestore = tableView.getSelectionModel().getSelectedItem();
+			caseToRestore.setIsArchive(false);
+			try {
+				ACase edited = caseRepo.save(caseToRestore);
+				caseList.add(edited);
+			} catch (OptimisticLockException ole) {
+				new CustomAlert("Обновление данных", "", "Параметры дела изменены другим пользователем!", ButtonType.OK)
+						.show();
+				caseList.add(caseRepo.findById(caseToRestore.getId()).get());
+			} finally {
+				caseList.remove(caseToRestore);
+				refreshTable();
+			}
 		}
 	}
 
@@ -308,10 +351,11 @@ public class MainController {
 		if (saveDir == null)
 			return;
 		boolean reportSaved = XLSXFileWriter.createReport(saveDir, model, archiveCheckbox.isSelected());
-		if (reportSaved)
+		if (reportSaved) {
 			new CustomAlert("Сохранение отчета", "Отчет сохранен!", "", ButtonType.OK).show();
-		else
+		} else {
 			new CustomAlert("Сохранение отчета", "Не удалось сохранить отчет!", "", ButtonType.CLOSE).show();
+		}
 	}
 
 //	***************************************************************************
@@ -329,8 +373,9 @@ public class MainController {
 		if (!user.isAdmin()) {
 			archiveButton.setDisable(true);
 			tableView.getSelectionModel().selectedItemProperty().removeListener(this::modifyArchiveButton);
-		} else
+		} else {
 			tableView.getSelectionModel().selectedItemProperty().addListener(this::modifyArchiveButton);
+		}
 		caseFilter.setRepr(user.toString());
 		refreshTable();
 	}
@@ -346,9 +391,9 @@ public class MainController {
 	 * @param newValue - the case currently selected
 	 */
 	private void modifyArchiveButton(ObservableValue<? extends ACase> property, ACase oldValue, ACase newValue) {
-		if (newValue == null)
+		if (newValue == null) {
 			archiveButton.setDisable(true);
-		else {
+		} else {
 			archiveButton.setDisable(false);
 			archiveButton.setOnAction(newValue.isArchive() ? this::restoreCaseFromArchive : this::moveCaseToArchive);
 			archiveButton.setText(newValue.isArchive() ? "Из архива" : "В архив");
@@ -370,10 +415,11 @@ public class MainController {
 	 * @param newValue - the case currently selected
 	 */
 	private void enableEditButton(ObservableValue<? extends ACase> property, ACase oldValue, ACase newValue) {
-		if (newValue == null || newValue.isArchive())
+		if (newValue == null || newValue.isArchive()) {
 			editCaseButton.setDisable(true);
-		else
+		} else {
 			editCaseButton.setDisable(false);
+		}
 	}
 
 	public void refreshTable() {

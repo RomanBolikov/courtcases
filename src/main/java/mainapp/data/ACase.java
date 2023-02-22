@@ -51,12 +51,10 @@ public class ACase {
 
 	private String caseNo;
 	
-	@NonNull
-	@Column(nullable = false)
+	@Column
 	private String plaintiff;
 	
-	@NonNull
-	@Column(nullable = false)
+	@Column
 	private String defendant;
 
 	@ManyToOne

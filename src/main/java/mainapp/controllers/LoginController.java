@@ -78,7 +78,10 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 	@FXML
 	private void loginAsAdmin(ActionEvent actionEvent) {
 		choiceDialog = new CustomChoiceDialog(
-				model.getReprRepo().findAll().stream().filter(repr -> repr.isAdmin()).collect(Collectors.toList()));
+				model.getReprRepo().findAll().stream()
+				.filter(repr -> repr.isAdmin())
+				.sorted((r1, r2) -> r1.getName().compareTo(r2.getName()))
+				.collect(Collectors.toList()));
 		DialogPane dp = choiceDialog.getDialogPane();
 		Button okButton = (Button) dp.lookupButton(ButtonType.OK);
 		okButton.setOnAction(this::promptLoginAsAdmin);
@@ -94,18 +97,19 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 
 	private void promptLogin(ActionEvent actionEvent) {
 		this.user = choiceDialog.getSelectedItem();
-		if (!this.user.isAdmin())
+		if (!this.user.isAdmin()) {
 			loadMainController();
-		else
+		} else {
 			displayPrompt(user);
+		}
 	}
 
 	private void promptLoginAsAdmin(ActionEvent actionEvent) {
 		Representative admin = choiceDialog.getSelectedItem();
-		if (!admin.isAdmin())
+		if (!admin.isAdmin()) {
 			new CustomAlert("Ошибка доступа", "Данный пользователь не наделен правами администратора!", "",
 					ButtonType.OK).showAndWait();
-		else {
+		} else {
 			Dialog<String> prompt = new PasswordInputDialog();
 			prompt.setHeaderText("Ввведите пароль");
 			CustomAlert alert = new CustomAlert("Ошибка ввода", "Введен неверный пароль!", "",
@@ -118,11 +122,9 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 						break;
 					} else {
 						Optional<ButtonType> retry = alert.showAndWait();
-						if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE)
-							break;
+						if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE) break;
 					}
-				} else
-					break;
+				} else break;
 			}
 		}
 	}
@@ -155,11 +157,9 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 					break;
 				} else {
 					Optional<ButtonType> retry = alert.showAndWait();
-					if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE)
-						break;
+					if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE) break;
 				}
-			} else
-				break;
+			} else break;
 		}
 	}
 
