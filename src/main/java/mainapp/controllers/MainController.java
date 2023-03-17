@@ -8,11 +8,12 @@ import java.util.Optional;
 
 import javax.persistence.OptimisticLockException;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -37,11 +38,12 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import mainapp.customGUI.CustomAlert;
 import mainapp.data.ACase;
-import mainapp.data.CaseFilter;
-import mainapp.data.CaseRepo;
-import mainapp.data.DataModel;
 import mainapp.data.Representative;
-import mainapp.data.XLSXFileWriter;
+import mainapp.helpers.CaseFilter;
+import mainapp.helpers.DataModel;
+import mainapp.helpers.XLSXFileWriter;
+import mainapp.repositories.CaseRepo;
+import mainapp.services.CaseService;
 import net.rgielen.fxweaver.core.FxControllerAndView;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -50,10 +52,11 @@ import net.rgielen.fxweaver.core.FxmlView;
 @FxmlView("main1.fxml")
 public class MainController {
 
-	private final DataModel model;
+	@Autowired
+	private ModelMapper modelMapper;
 
-	private final CaseRepo caseRepo;
-
+	private final CaseService caseService;
+	
 	private ObservableList<ACase> caseList;
 
 	private final CaseFilter caseFilter;
@@ -70,10 +73,9 @@ public class MainController {
 	private final Image removeIcon = new Image(
 			this.getClass().getResource("/mainapp/images/remove.png").toExternalForm());
 
-	public MainController(DataModel model, FxWeaver fxWeaver, CaseFilter casefilter) {
-		this.model = model;
-		this.caseRepo = model.getCaseRepo();
-		this.caseList = FXCollections.observableArrayList(model.getCaseRepo().findAll());
+	public MainController(CaseService caseService, FxWeaver fxWeaver, CaseFilter casefilter) {
+		this.caseService = caseService;
+		this.caseList = caseService.getAllCases();
 		this.fxWeaver = fxWeaver;
 		this.caseFilter = casefilter;
 	}
@@ -239,6 +241,7 @@ public class MainController {
 			return row;
 		});
 		tableView.getSelectionModel().selectedItemProperty().addListener(this::enableEditButton);
+		tableView.getSortOrder().add(reprColumn);
 		archiveCheckbox.selectedProperty().addListener((obs, oldVal, newVal) -> refreshTable());
 	}
 
@@ -309,7 +312,6 @@ public class MainController {
 				caseList.add(caseRepo.findById(caseToBeMoved.getId()).get());
 			} finally {
 				caseList.remove(caseToBeMoved);
-				refreshTable();
 			}
 		}
 	}
@@ -425,6 +427,7 @@ public class MainController {
 	public void refreshTable() {
 		tableView.setItems(
 				caseList.filtered(caseFilter.and(acase -> archiveCheckbox.isSelected() ? true : !acase.isArchive())));
+		tableView.sort();
 	}
 
 	public void setStage(Stage stage) {

@@ -13,8 +13,10 @@ import javafx.scene.layout.GridPane;
 import mainapp.customGUI.CustomAlert;
 import mainapp.data.CaseType;
 import mainapp.data.Court;
+import mainapp.data.CourtStage;
 import mainapp.data.Relation;
 import mainapp.data.Representative;
+import mainapp.data.Stage;
 
 
 public abstract class AbstractCaseController {
@@ -40,7 +42,7 @@ public abstract class AbstractCaseController {
 	protected TextField caseNoTextField;
 
 	@FXML
-	protected ChoiceBox<mainapp.data.Stage> stageChoiceBox;
+	protected ChoiceBox<CourtStage> stageChoiceBox;
 
 	@FXML
 	protected DatePicker currDatePicker;
@@ -79,11 +81,11 @@ public abstract class AbstractCaseController {
 //	***************************************************************************
 	
 	protected void setRestrictions(Relation relation) {
-		if (relation.getId() == 1) {
+		if (relation == Relation.PLAINTIFF) {
 			plaintiffTextField.setText("Минстрой края");
 			plaintiffTextField.setDisable(true);
 			defendantTextField.setDisable(false);
-		} else if (relation.getId() == 2) {
+		} else if (relation == Relation.DEFENDANT) {
 			plaintiffTextField.setDisable(false);
 			defendantTextField.setText("Минстрой края");
 			defendantTextField.setDisable(true);

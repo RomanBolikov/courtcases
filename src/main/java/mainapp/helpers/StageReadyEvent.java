@@ -1,4 +1,4 @@
-package mainapp;
+package mainapp.helpers;
 
 import org.springframework.context.ApplicationEvent;
 import javafx.stage.Stage;

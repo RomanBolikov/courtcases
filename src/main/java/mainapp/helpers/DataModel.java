@@ -1,9 +1,15 @@
-package mainapp.data;
+package mainapp.helpers;
 
 import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import mainapp.repositories.CaseRepo;
+import mainapp.repositories.CaseTypeRepo;
+import mainapp.repositories.CourtRepo;
+import mainapp.repositories.RelationRepo;
+import mainapp.repositories.RepresentativeRepo;
+import mainapp.repositories.StageRepo;
 
 @Component
 @AllArgsConstructor

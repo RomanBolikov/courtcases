@@ -1,9 +1,11 @@
-package mainapp.data;
+package mainapp.helpers;
 
 import java.time.LocalDate;
 import java.util.function.Predicate;
 
 import org.springframework.stereotype.Component;
+
+import mainapp.data.ACase;
 
 @Component
 public class CaseFilter implements Predicate<ACase> {

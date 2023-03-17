@@ -1,4 +1,4 @@
-package mainapp.data;
+package mainapp.helpers;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,6 +17,9 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellUtil;
+
+import mainapp.data.ACase;
+import mainapp.data.Relation;
 
 /**
  * A helper class providing static methods for making an .xlsx report for cases

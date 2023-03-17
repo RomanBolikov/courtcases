@@ -14,9 +14,9 @@ import javafx.util.StringConverter;
 import mainapp.customGUI.CustomAlert;
 import mainapp.data.ACase;
 import mainapp.data.Court;
-import mainapp.data.DataModel;
-import mainapp.data.DatePickerConverter;
 import mainapp.data.Representative;
+import mainapp.helpers.DataModel;
+import mainapp.helpers.DatePickerConverter;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component

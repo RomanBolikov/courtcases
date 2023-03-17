@@ -33,12 +33,12 @@ public class ACase {
 	@NonNull
 	@ManyToOne
 	@JoinColumn(name = "relation", nullable = false)
-	private Relation relation;
+	private String relation;
 
 	@NonNull
 	@ManyToOne
 	@JoinColumn(name = "case_type", nullable = false)
-	private CaseType caseType;
+	private String caseType;
 	
 	@NonNull
 	@Column(name = "case_title", nullable = false)
@@ -64,7 +64,7 @@ public class ACase {
 	@NonNull
 	@ManyToOne
 	@JoinColumn(name = "stage", nullable = false)
-	private Stage stage;
+	private String stage;
 
 	@Column(name = "curr_date")
 	private Timestamp currentDate;

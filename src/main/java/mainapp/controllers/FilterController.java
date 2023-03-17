@@ -15,8 +15,8 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import mainapp.data.CaseFilter;
-import mainapp.data.DataModel;
+import mainapp.helpers.CaseFilter;
+import mainapp.helpers.DataModel;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component

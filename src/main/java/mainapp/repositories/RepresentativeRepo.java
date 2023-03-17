@@ -1,4 +1,4 @@
-package mainapp.data;
+package mainapp.repositories;
 
 import java.util.List;
 
@@ -6,6 +6,8 @@ import javax.persistence.LockModeType;
 
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.repository.CrudRepository;
+
+import mainapp.data.Representative;
 
 public interface RepresentativeRepo extends CrudRepository<Representative, Integer> {
 

@@ -1,28 +1,21 @@
 package mainapp.data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
-@Entity
-public class CaseType {
+public enum CaseType {
+	CIVIL("Гражданское дело"),
+	PUBLIC("Административное дело"),
+	BANKRUPTCY("Дело о банкротстве"),
+	ADMIN_OFFENCE("Дело об административном правонарушении"),
+	CRIMINAL("Уголовное дело");
 	
-	@Column(name = "type_id")
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Id
-	private Integer id;
+	public final String label;
+		
+	private CaseType(String label) {
+		 this.label = label;
+	}
 	
-	@Column
-	private String type;
-	
+	@Override
 	public String toString() {
-		return type;
+		return label;
 	}
 }

@@ -5,6 +5,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
+import mainapp.helpers.StageReadyEvent;
 
 public class JavaFxApplication extends Application {
 	private ConfigurableApplicationContext appContext;

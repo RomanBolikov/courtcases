@@ -1,4 +1,4 @@
-package mainapp.data;
+package mainapp.helpers;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;

@@ -1,10 +1,12 @@
- package mainapp.controllers;
+package mainapp.controllers;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
 
 import javax.persistence.OptimisticLockException;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javafx.collections.FXCollections;
@@ -18,17 +20,23 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import mainapp.customGUI.CustomAlert;
 import mainapp.data.ACase;
+import mainapp.data.CaseType;
 import mainapp.data.Court;
-import mainapp.data.CourtRepo;
-import mainapp.data.DataModel;
-import mainapp.data.DatePickerConverter;
+import mainapp.data.CourtStage;
 import mainapp.data.Relation;
+import mainapp.helpers.DataModel;
+import mainapp.helpers.DatePickerConverter;
+import mainapp.repositories.CourtRepo;
+import mainapp.services.CaseService;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
 @FxmlView("editcase.fxml")
 public class EditCaseController extends AbstractCaseController {
 
+	@Autowired
+	private ModelMapper modelMapper;
+	
 	private Stage stage;
 
 	private MainController parent;
@@ -37,10 +45,10 @@ public class EditCaseController extends AbstractCaseController {
 
 	private ACase caseToEdit;
 
-	private final DataModel model;
+	private final CaseService caseService;
 
-	public EditCaseController(DataModel model) {
-		this.model = model;
+	public EditCaseController(CaseService caseService) {
+		this.caseService = caseService;
 	}
 
 // 	FXML-annotated methods
@@ -52,10 +60,10 @@ public class EditCaseController extends AbstractCaseController {
 		stage.setTitle("Редактирование дела");
 		stage.setResizable(false);
 		stage.setScene(new Scene(gridPane));
-		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(model.getCaseTypeRepo().findAll()));
-		relationChoiceBox.setItems(FXCollections.observableArrayList(model.getRelationRepo().findAll()));
+		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(CaseType.values()));
+		relationChoiceBox.setItems(FXCollections.observableArrayList(Relation.values()));
 		representativeChoiceBox.setItems(FXCollections.observableArrayList(model.getReprRepo().findAll()));
-		stageChoiceBox.setItems(FXCollections.observableArrayList(model.getStageRepo().findAll()));
+		stageChoiceBox.setItems(FXCollections.observableArrayList(CourtStage.values()));
 		courtComboBox.setItems(FXCollections.observableArrayList(model.getCourtRepo().findAll()));
 		courtComboBox.setConverter(new StringConverter<Court>() {
 			@Override
