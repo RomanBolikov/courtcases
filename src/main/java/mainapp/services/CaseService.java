@@ -3,7 +3,7 @@ package mainapp.services;
 import javafx.collections.ObservableList;
 import mainapp.data.ACase;
 import mainapp.data.Representative;
-import mainapp.helpers.SaveCaseException;
+import mainapp.helpers.SaveEntityException;
 
 public interface CaseService {
 	
@@ -15,8 +15,8 @@ public interface CaseService {
 	
 	ACase getCaseById(int id);
 	
-	ACase addCase(ACase acase) throws SaveCaseException;
+	ACase addCase(ACase acase) throws SaveEntityException;
 
-	ACase updateCase(int id, ACase updatedCase) throws SaveCaseException;
+	ACase updateCase(int id, ACase updatedCase) throws SaveEntityException;
 	
 }

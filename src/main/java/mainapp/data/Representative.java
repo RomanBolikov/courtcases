@@ -26,7 +26,7 @@ public class Representative {
 
 	@NonNull
 	private String name;
-
+	
 	private String password;
 	
 	@Column(name = "isadmin")

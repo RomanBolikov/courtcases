@@ -16,7 +16,6 @@ import mainapp.data.Court;
 import mainapp.data.CourtStage;
 import mainapp.data.Relation;
 import mainapp.data.Representative;
-import mainapp.data.Stage;
 
 
 public abstract class AbstractCaseController {

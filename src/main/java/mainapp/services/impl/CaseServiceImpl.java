@@ -8,7 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import mainapp.data.ACase;
 import mainapp.data.Representative;
-import mainapp.helpers.SaveCaseException;
+import mainapp.helpers.SaveEntityException;
 import mainapp.repositories.CaseRepo;
 import mainapp.services.CaseService;
 
@@ -42,17 +42,17 @@ public class CaseServiceImpl implements CaseService {
 	}
 	
 	@Override
-	public ACase addCase(ACase acase) throws SaveCaseException {
+	public ACase addCase(ACase acase) throws SaveEntityException {
 		try {
 			return caseRepo.save(acase);
 		} catch (OptimisticLockException ole) {
-			throw new SaveCaseException("An OptimisticLockException has occurred");
+			throw new SaveEntityException("An OptimisticLockException has occurred");
 		}
 	}
 
 	@Override
-	public ACase updateCase(int id, ACase updatedCase) throws SaveCaseException {
-		ACase acase = caseRepo.findById(id).orElseThrow(() -> new SaveCaseException("Case not found in database"));
+	public ACase updateCase(int id, ACase updatedCase) throws SaveEntityException {
+		ACase acase = caseRepo.findById(id).orElseThrow(() -> new SaveEntityException("Case not found in database"));
 		acase.setRelation(updatedCase.getRelation());
 		acase.setCaseType(updatedCase.getCaseType());
 		acase.setTitle(updatedCase.getTitle());
@@ -67,7 +67,7 @@ public class CaseServiceImpl implements CaseService {
 		try {
 			return caseRepo.save(acase);
 		} catch (OptimisticLockException ole) {
-			throw new SaveCaseException("An OptimisticLockException has occurred");
+			throw new SaveEntityException("An OptimisticLockException has occurred");
 		}
 	}
 }

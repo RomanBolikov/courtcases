@@ -28,14 +28,15 @@ import mainapp.helpers.DataModel;
 import mainapp.helpers.DatePickerConverter;
 import mainapp.repositories.CourtRepo;
 import mainapp.services.CaseService;
+import mainapp.services.ReprService;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
 @FxmlView("editcase.fxml")
 public class EditCaseController extends AbstractCaseController {
 
-	@Autowired
-	private ModelMapper modelMapper;
+//	@Autowired
+//	private ModelMapper modelMapper;
 	
 	private Stage stage;
 
@@ -46,10 +47,13 @@ public class EditCaseController extends AbstractCaseController {
 	private ACase caseToEdit;
 
 	private final CaseService caseService;
+	
+	private final ReprService reprService;
 
-	public EditCaseController(CaseService caseService) {
-		this.caseService = caseService;
-	}
+//	public EditCaseController(CaseService caseService, ReprService reprService) {
+//		this.caseService = caseService;
+//		this.reprService = reprService;
+//	}
 
 // 	FXML-annotated methods
 
@@ -62,7 +66,7 @@ public class EditCaseController extends AbstractCaseController {
 		stage.setScene(new Scene(gridPane));
 		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(CaseType.values()));
 		relationChoiceBox.setItems(FXCollections.observableArrayList(Relation.values()));
-		representativeChoiceBox.setItems(FXCollections.observableArrayList(model.getReprRepo().findAll()));
+		representativeChoiceBox.setItems(reprService.getAllReprs());
 		stageChoiceBox.setItems(FXCollections.observableArrayList(CourtStage.values()));
 		courtComboBox.setItems(FXCollections.observableArrayList(model.getCourtRepo().findAll()));
 		courtComboBox.setConverter(new StringConverter<Court>() {

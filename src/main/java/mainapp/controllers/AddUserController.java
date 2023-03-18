@@ -54,8 +54,7 @@ public class AddUserController extends AbstractUserController {
 					Optional<String> newPassword = prompt.showAndWait();
 					if (newPassword.isPresent()) {
 						if (!newPassword.get().equals("invalid")) {
-							String pswHash = BCrypt.hashpw(newPassword.get(), BCrypt.gensalt(4));
-							newUser.setPassword(pswHash);
+							newUser.setPassword(BCrypt.hashpw(newPassword.get(), BCrypt.gensalt(4)));
 							new CustomAlert("Подтверждение", "", "Пароль успешно установлен!", ButtonType.OK).show();
 							break;
 						} else {
