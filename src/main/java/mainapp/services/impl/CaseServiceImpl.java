@@ -1,5 +1,7 @@
 package mainapp.services.impl;
 
+import java.util.List;
+
 import javax.persistence.OptimisticLockException;
 
 import org.springframework.stereotype.Service;
@@ -27,8 +29,8 @@ public class CaseServiceImpl implements CaseService {
 	}
 
 	@Override
-	public ObservableList<ACase> getCasesByRepr(Representative repr) {
-		return FXCollections.observableArrayList(caseRepo.findByRepr(repr));
+	public List<ACase> getCasesByRepr(Representative repr) {
+		return caseRepo.findByRepr(repr);
 	}
 
 	@Override
@@ -42,28 +44,7 @@ public class CaseServiceImpl implements CaseService {
 	}
 	
 	@Override
-	public ACase addCase(ACase acase) throws SaveEntityException {
-		try {
-			return caseRepo.save(acase);
-		} catch (OptimisticLockException ole) {
-			throw new SaveEntityException("An OptimisticLockException has occurred");
-		}
-	}
-
-	@Override
-	public ACase updateCase(int id, ACase updatedCase) throws SaveEntityException {
-		ACase acase = caseRepo.findById(id).orElseThrow(() -> new SaveEntityException("Case not found in database"));
-		acase.setRelation(updatedCase.getRelation());
-		acase.setCaseType(updatedCase.getCaseType());
-		acase.setTitle(updatedCase.getTitle());
-		acase.setCourt(updatedCase.getCourt());
-		acase.setCaseNo(updatedCase.getCaseNo());
-		acase.setPlaintiff(updatedCase.getPlaintiff());
-		acase.setDefendant(updatedCase.getDefendant());
-		acase.setRepr(updatedCase.getRepr());
-		acase.setStage(updatedCase.getStage());
-		acase.setCurrentDate(updatedCase.getCurrentDate());
-		acase.setCurrentState(updatedCase.getCurrentState());
+	public ACase saveCase(ACase acase) throws SaveEntityException {
 		try {
 			return caseRepo.save(acase);
 		} catch (OptimisticLockException ole) {

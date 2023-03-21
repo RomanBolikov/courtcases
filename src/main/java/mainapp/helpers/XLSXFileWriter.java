@@ -29,19 +29,17 @@ public class XLSXFileWriter {
 
 	private static final String templatePath = "/mainapp/reportTemplate.xlsx";
 
-	public static boolean createReport(File directory, DataModel model, boolean includeArchive) {
-		try (InputStream is = XLSXFileWriter.class.getResourceAsStream(templatePath);
-			Workbook wb = WorkbookFactory.create(is)) {
+	public static boolean createReport(File directory, List<ACase> list) {
+		try (InputStream inputStream = XLSXFileWriter.class.getResourceAsStream(templatePath);
+				Workbook wb = WorkbookFactory.create(inputStream)) {
 			CellStyle cs = wb.createCellStyle();
 			cs.setWrapText(true);
 			cs.setVerticalAlignment(VerticalAlignment.TOP);
 
 			Sheet sheet1 = wb.getSheet("Истец_заявитель");
-			Relation relation1 = model.getRelationRepo().findById(1).get();
-			List<ACase> list1 = model.getCaseRepo().findByRelation(relation1);
+			List<ACase> list1 = list.stream().filter(c -> c.getRelation() == Relation.PLAINTIFF).toList();
 			for (int i = 0, currRow = 2; i < list1.size(); i++) {
 				ACase acase = list1.get(i);
-				if (!includeArchive && acase.isArchive()) continue;
 				Row row = sheet1.createRow(currRow);
 				CellUtil.createCell(row, 0, String.valueOf(currRow - 1), cs);
 				CellUtil.createCell(row, 1, acase.getDefendant() == null ? "" : acase.getDefendant(), cs);
@@ -56,11 +54,9 @@ public class XLSXFileWriter {
 			}
 
 			Sheet sheet2 = wb.getSheet("Отв.(заинт. лицо)");
-			Relation relation2 = model.getRelationRepo().findById(2).get();
-			List<ACase> list2 = model.getCaseRepo().findByRelation(relation2);
+			List<ACase> list2 = list.stream().filter(c -> c.getRelation() == Relation.DEFENDANT).toList();
 			for (int i = 0, currRow = 2; i < list2.size(); i++) {
 				ACase acase = list2.get(i);
-				if (!includeArchive && acase.isArchive()) continue;
 				Row row = sheet2.createRow(currRow);
 				CellUtil.createCell(row, 0, String.valueOf(currRow - 1), cs);
 				CellUtil.createCell(row, 1, acase.getPlaintiff() == null ? "" : acase.getPlaintiff(), cs);
@@ -75,11 +71,9 @@ public class XLSXFileWriter {
 			}
 
 			Sheet sheet3 = wb.getSheet("Третье лицо");
-			Relation relation3 = model.getRelationRepo().findById(3).get();
-			List<ACase> list3 = model.getCaseRepo().findByRelation(relation3);
+			List<ACase> list3 = list.stream().filter(c -> c.getRelation() == Relation.THIRD_PERSON).toList();
 			for (int i = 0, currRow = 2; i < list3.size(); i++) {
 				ACase acase = list3.get(i);
-				if (!includeArchive && acase.isArchive()) continue;
 				Row row = sheet3.createRow(currRow);
 				CellUtil.createCell(row, 0, String.valueOf(currRow - 1), cs);
 				CellUtil.createCell(row, 1, acase.getPlaintiff() == null ? "" : acase.getPlaintiff(), cs);
@@ -95,11 +89,10 @@ public class XLSXFileWriter {
 			}
 
 			Sheet sheet4 = wb.getSheet("Уголовные и КоАП");
-			Relation relation4 = model.getRelationRepo().findById(5).get();
-			List<ACase> list4 = model.getCaseRepo().findByRelation(relation4);
+			List<ACase> list4 = list.stream().filter(c -> c.getRelation() == Relation.CRIMINAL_AND_ADMIN_OFFENCES)
+					.toList();
 			for (int i = 0, currRow = 2; i < list4.size(); i++) {
 				ACase acase = list4.get(i);
-				if (!includeArchive && acase.isArchive()) continue;
 				Row row = sheet4.createRow(currRow);
 				CellUtil.createCell(row, 0, String.valueOf(currRow - 1), cs);
 				CellUtil.createCell(row, 1, acase.getDefendant() == null ? "" : acase.getDefendant(), cs);
@@ -114,11 +107,9 @@ public class XLSXFileWriter {
 			}
 
 			Sheet sheet5 = wb.getSheet("Иные дела на контроле");
-			Relation relation5 = model.getRelationRepo().findById(4).get();
-			List<ACase> list5 = model.getCaseRepo().findByRelation(relation5);
+			List<ACase> list5 = list.stream().filter(c -> c.getRelation() == Relation.CONTROLLED).toList();
 			for (int i = 0, currRow = 2; i < list5.size(); i++) {
 				ACase acase = list5.get(i);
-				if (!includeArchive && acase.isArchive()) continue;
 				Row row = sheet5.createRow(currRow);
 				CellUtil.createCell(row, 0, String.valueOf(currRow - 1), cs);
 				CellUtil.createCell(row, 1, acase.getPlaintiff() == null ? "" : acase.getPlaintiff(), cs);
@@ -132,7 +123,6 @@ public class XLSXFileWriter {
 				cell8.setCellStyle(cs);
 				currRow++;
 			}
-
 			return saveFile(directory, wb);
 		} catch (EncryptedDocumentException | IOException e) {
 			return false;

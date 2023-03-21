@@ -22,8 +22,8 @@ import mainapp.customGUI.CustomAlert;
 import mainapp.customGUI.CustomChoiceDialog;
 import mainapp.customGUI.PasswordInputDialog;
 import mainapp.data.Representative;
-import mainapp.helpers.DataModel;
 import mainapp.helpers.StageReadyEvent;
+import mainapp.services.ReprService;
 import net.rgielen.fxweaver.core.FxControllerAndView;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -32,10 +32,10 @@ import net.rgielen.fxweaver.core.FxmlView;
 @FxmlView("start.fxml")
 public class LoginController implements ApplicationListener<StageReadyEvent> {
 
-	private final DataModel model;
-
 	private final FxWeaver fxWeaver;
 
+	private final ReprService reprService;
+	
 	private Representative user;
 
 	private CustomChoiceDialog choiceDialog;
@@ -51,8 +51,8 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 	@FXML
 	private Button quitButton;
 
-	public LoginController(DataModel model, FxWeaver fxWeaver) {
-		this.model = model;
+	public LoginController(FxWeaver fxWeaver, ReprService reprService) {
+		this.reprService = reprService;
 		this.fxWeaver = fxWeaver;
 	}
 
@@ -66,7 +66,7 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 
 	@FXML
 	private void chooseUser(ActionEvent actionEvent) {
-		choiceDialog = new CustomChoiceDialog(model.getReprRepo().findAll());
+		choiceDialog = new CustomChoiceDialog(reprService.getAllReprs());
 		DialogPane dp = choiceDialog.getDialogPane();
 		Button okButton = (Button) dp.lookupButton(ButtonType.OK);
 		okButton.setOnAction(this::promptLogin);
@@ -78,7 +78,7 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 	@FXML
 	private void loginAsAdmin(ActionEvent actionEvent) {
 		choiceDialog = new CustomChoiceDialog(
-				model.getReprRepo().findAll().stream()
+				reprService.getAllReprs().stream()
 				.filter(repr -> repr.isAdmin())
 				.sorted((r1, r2) -> r1.getName().compareTo(r2.getName()))
 				.collect(Collectors.toList()));

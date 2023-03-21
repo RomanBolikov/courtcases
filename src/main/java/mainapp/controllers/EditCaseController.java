@@ -3,10 +3,6 @@ package mainapp.controllers;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 
-import javax.persistence.OptimisticLockException;
-
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javafx.collections.FXCollections;
@@ -24,23 +20,22 @@ import mainapp.data.CaseType;
 import mainapp.data.Court;
 import mainapp.data.CourtStage;
 import mainapp.data.Relation;
-import mainapp.helpers.DataModel;
+import mainapp.data.Representative;
 import mainapp.helpers.DatePickerConverter;
-import mainapp.repositories.CourtRepo;
+import mainapp.helpers.SaveEntityException;
 import mainapp.services.CaseService;
+import mainapp.services.CourtService;
 import mainapp.services.ReprService;
 import net.rgielen.fxweaver.core.FxmlView;
+
 
 @Component
 @FxmlView("editcase.fxml")
 public class EditCaseController extends AbstractCaseController {
 
-//	@Autowired
-//	private ModelMapper modelMapper;
-	
 	private Stage stage;
 
-	private MainController parent;
+//	private MainController parent;
 	
 	private ObservableList<ACase> caseList;
 
@@ -48,12 +43,15 @@ public class EditCaseController extends AbstractCaseController {
 
 	private final CaseService caseService;
 	
+	private final CourtService courtService;
+	
 	private final ReprService reprService;
 
-//	public EditCaseController(CaseService caseService, ReprService reprService) {
-//		this.caseService = caseService;
-//		this.reprService = reprService;
-//	}
+	public EditCaseController(CaseService caseService, CourtService courtService, ReprService reprService) {
+		this.caseService = caseService;
+		this.courtService = courtService;
+		this.reprService = reprService;
+	}
 
 // 	FXML-annotated methods
 
@@ -68,7 +66,7 @@ public class EditCaseController extends AbstractCaseController {
 		relationChoiceBox.setItems(FXCollections.observableArrayList(Relation.values()));
 		representativeChoiceBox.setItems(reprService.getAllReprs());
 		stageChoiceBox.setItems(FXCollections.observableArrayList(CourtStage.values()));
-		courtComboBox.setItems(FXCollections.observableArrayList(model.getCourtRepo().findAll()));
+		courtComboBox.setItems(courtService.getAllCourts());
 		courtComboBox.setConverter(new StringConverter<Court>() {
 			@Override
 			public String toString(Court court) {
@@ -118,20 +116,23 @@ public class EditCaseController extends AbstractCaseController {
 			return;
 		}
 		Court court = courtComboBox.getValue(); // what was specified by user
-		String courtName = court.getName();
-		CourtRepo courtRepo = model.getCourtRepo();
-		if (!courtRepo.existsByName(courtName)) {
-			court = courtRepo.save(court);
+		if (!courtService.existsInDB(court)) {
+			try {
+				court = courtService.addCourt(court);
+			} catch (SaveEntityException see) {
+				new CustomAlert("Ошибка", "", "Возникла ошибка при сохранении", ButtonType.OK).show();
+				return;
+			}
 			caseToEdit.setCourt(court);
-		} else if (!courtName.equals(caseToEdit.getCourt().getName())) { // if such a court exists in DB then
-			caseToEdit.setCourt(courtRepo.findByName(courtName).get()); // we simply set it as case property
+		} else if (!court.getName().equals(caseToEdit.getCourt().getName())) { 	// if such a court exists in DB then
+			caseToEdit.setCourt(courtService.findCourtByEntity(court)); 		// we simply set it as case property
 		}
 		if (!caseNoTextField.getText().isEmpty()) {
 			caseToEdit.setCaseNo(caseNoTextField.getText());
 		}
-		String repr = representativeChoiceBox.getValue().getName();
-		if (!repr.equals(caseToEdit.getRepr().getName())) {
-			caseToEdit.setRepr(model.getReprRepo().findByName(repr));
+		Representative repr = representativeChoiceBox.getValue();
+		if (!repr.getName().equals(caseToEdit.getRepr().getName())) {
+			caseToEdit.setRepr(reprService.getRepr(repr));
 		}
 		if (currDatePicker.getValue() != null && !hourTextField.getText().isEmpty()
 				&& !minuteTextField.getText().isEmpty()) {
@@ -162,16 +163,16 @@ public class EditCaseController extends AbstractCaseController {
 			caseToEdit.setCurrentState(currentState.getText());
 		}
 		try {
-			ACase updatedCase = model.getCaseRepo().save(caseToEdit);
+			ACase updatedCase = caseService.saveCase(caseToEdit);
 			new CustomAlert("Подтверждение", "", "Дело внесено в базу данных!", ButtonType.OK).show();
 			caseList.add(updatedCase);
-		} catch (OptimisticLockException ole) {
+		} catch (SaveEntityException see) {
 			new CustomAlert("Обновление данных", "", "Параметры дела изменены другим пользователем!", ButtonType.OK)
 					.show();
-			caseList.add(model.getCaseRepo().findById(caseToEdit.getId()).get());
+			caseList.add(caseService.getCaseById(caseToEdit.getId()));
 		} finally {
 			caseList.remove(caseToEdit);
-			parent.refreshTable();
+//			parent.refreshTable();
 			stage.close();
 		}
 	}
@@ -207,21 +208,12 @@ public class EditCaseController extends AbstractCaseController {
 			minuteTextField.setText(String.format("%02d", time[1]));
 		}
 
-		// adding listeners to avoid extra DB operations
+		// adding listeners to change case properties automatically
 		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> setRestrictions(newVal));
 		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setRelation(newVal));
 		caseTypeChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setCaseType(newVal));
 		representativeChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setRepr(newVal));
 		stageChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setStage(newVal));
-		courtComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
-			Court court = newVal;
-			if (model.getCourtRepo().existsByName(court.getName())) {
-				court = model.getCourtRepo().findByName(court.getName()).get();
-			} else {
-				court = model.getCourtRepo().save(court);
-			}
-			caseToEdit.setCourt(court);
-		});
 		currDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
 			hourTextField.setText("");
 			minuteTextField.setText("");
@@ -229,7 +221,7 @@ public class EditCaseController extends AbstractCaseController {
 		stage.show();
 	}
 
-	public void setParent(MainController parent) {
-		this.parent = parent;
-	}
+//	public void setParent(MainController parent) {
+//		this.parent = parent;
+//	}
 }

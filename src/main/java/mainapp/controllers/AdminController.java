@@ -2,8 +2,6 @@ package mainapp.controllers;
 
 import java.util.Optional;
 
-import javax.persistence.OptimisticLockException;
-
 import org.springframework.data.util.Pair;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
@@ -11,7 +9,6 @@ import org.springframework.stereotype.Component;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -33,9 +30,9 @@ import mainapp.customGUI.CustomAlert;
 import mainapp.customGUI.PasswordSetDialog;
 import mainapp.data.ACase;
 import mainapp.data.Representative;
-import mainapp.helpers.DataModel;
-import mainapp.repositories.CaseRepo;
-import mainapp.repositories.RepresentativeRepo;
+import mainapp.helpers.SaveEntityException;
+import mainapp.services.CaseService;
+import mainapp.services.ReprService;
 import net.rgielen.fxweaver.core.FxControllerAndView;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -44,18 +41,18 @@ import net.rgielen.fxweaver.core.FxmlView;
 @FxmlView("admin.fxml")
 public class AdminController {
 
-	private CaseRepo caseRepo;
+	private final CaseService caseService;
 
-	private RepresentativeRepo reprRepo;
+	private final ReprService reprService;
 
 	private ObservableList<Representative> reprList;
 
-	private FxWeaver fxWeaver;
+	private final FxWeaver fxWeaver;
 
-	public AdminController(DataModel model, FxWeaver fxWeaver) {
-		this.caseRepo = model.getCaseRepo();
-		this.reprRepo = model.getReprRepo();
-		this.reprList = FXCollections.observableArrayList(reprRepo.findAll());
+	public AdminController(CaseService caseService, ReprService reprService, FxWeaver fxWeaver) {
+		this.caseService = caseService;
+		this.reprService = reprService;
+		this.reprList = reprService.getAllReprs();
 		this.fxWeaver = fxWeaver;
 	}
 
@@ -112,26 +109,38 @@ public class AdminController {
 	@FXML
 	private void addUser(ActionEvent actionEvent) {
 		Optional<Representative> newUserOptional = fxWeaver.loadController(AddUserController.class).showAndWait();
-		if (newUserOptional.isPresent()) {
-			Representative newUser = newUserOptional.get();
-			reprRepo.save(newUser);
-			reprList.addAll(newUser);
-			tableView.refresh();
+		if (newUserOptional.isEmpty())
+			return;
+		Representative newUser = newUserOptional.get();
+		try {
+			reprService.addNewRepr(newUser);
+		} catch (SaveEntityException see) {
+			new CustomAlert("Ошибка", "", "Возникла ошибка при сохранении нового пользователя", ButtonType.OK).show();
+			return;
 		}
+		reprList.add(newUser);
+//		tableView.refresh();
 	}
 
 	@FXML
 	private void editUser(ActionEvent actionEvent) {
 		Representative userToEdit = tableView.getSelectionModel().selectedItemProperty().getValue();
 		Pair<String, Boolean> result = fxWeaver.loadController(EditUserController.class).showAndWait(userToEdit);
-		if (result == null) return;
+		if (result == null)
+			return;
 		userToEdit.setName(result.getFirst());
 		userToEdit.setIsAdmin(result.getSecond());
 		if (!userToEdit.isAdmin()) {
-			reprRepo.save(userToEdit);
+			try {
+				reprService.updateRepr(userToEdit.getId(), userToEdit);
+			} catch (SaveEntityException see) {
+				new CustomAlert("Ошибка", "", "Возникла ошибка при сохранении нового пользователя", ButtonType.OK)
+						.show();
+				return;
+			}
 			new CustomAlert("Подверждение", "Данные пользователя " + userToEdit + " обновлены!", "", ButtonType.OK)
 					.show();
-			tableView.refresh();
+//			tableView.refresh();
 			return;
 		}
 		// this part of the method works only for users with admin privileges and sets a
@@ -142,18 +151,23 @@ public class AdminController {
 				new ButtonType("Повторить", ButtonData.OK_DONE), new ButtonType("Закрыть", ButtonData.CANCEL_CLOSE));
 		while (true) {
 			Optional<String> newPassword = prompt.showAndWait();
-			if (newPassword.isPresent()) {
-				if (!newPassword.get().equals("invalid")) {
-					String pswHash = BCrypt.hashpw(newPassword.get(), BCrypt.gensalt(4));
-					userToEdit.setPassword(pswHash);
-					reprRepo.save(userToEdit);
-					new CustomAlert("Подтверждение", "", "Пароль успешно установлен!", ButtonType.OK).show();
-					break;
-				} else {
-					Optional<ButtonType> retry = alert.showAndWait();
-					if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE) break;
+			if (newPassword.isEmpty()) break; 
+			if (!newPassword.get().equals("invalid")) {
+				String pswHash = BCrypt.hashpw(newPassword.get(), BCrypt.gensalt(4));
+				userToEdit.setPassword(pswHash);
+				try {
+					reprService.updateRepr(userToEdit.getId(), userToEdit);
+				} catch (SaveEntityException see) {
+					new CustomAlert("Ошибка", "", "Возникла ошибка при сохранении нового пользователя", ButtonType.OK)
+							.show();
+					return;
 				}
-			} else break;
+				new CustomAlert("Подтверждение", "", "Пароль успешно установлен!", ButtonType.OK).show();
+				break;
+			} else {
+				Optional<ButtonType> retry = alert.showAndWait();
+				if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE) break;
+			}
 		}
 	}
 
@@ -165,22 +179,21 @@ public class AdminController {
 				new ButtonType("Подтвердить", ButtonData.OK_DONE), new ButtonType("Отменить", ButtonData.CANCEL_CLOSE));
 		Optional<ButtonType> choice = alert.showAndWait();
 		if (choice.isPresent() && choice.get().getButtonData() == ButtonData.OK_DONE) {
-			for (ACase acase : caseRepo.findByRepr(userToDelete)) {
+			for (ACase acase : caseService.getCasesByRepr(userToDelete)) {
 				try {
 					acase.setRepr(null);
-					caseRepo.save(acase);
-				} catch (OptimisticLockException ignored) {
-				}
+					caseService.saveCase(acase);
+				} catch (SaveEntityException ignored) {}
 			}
 			try {
-				reprRepo.delete(userToDelete);
+				reprService.deleteRepr(userToDelete.getId());
 				new CustomAlert("Подтверждение", "Пользователь " + userToDelete + " удален!", "", ButtonType.OK).show();
-			} catch (OptimisticLockException ole) {
-				new CustomAlert("Обновление данных", "", "Пользователь уже удален!", ButtonType.OK).show();
+			} catch (SaveEntityException ignored) {
+				new CustomAlert("Ошибка", "", "Возникла ошибка при удалении пользователя", ButtonType.OK).show();
 			} finally {
 				reprList.remove(userToDelete);
 			}
-			tableView.refresh();
+//			tableView.refresh();
 		}
 	}
 

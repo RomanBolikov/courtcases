@@ -8,7 +8,7 @@ public enum CaseType {
 	ADMIN_OFFENCE("Дело об административном правонарушении"),
 	CRIMINAL("Уголовное дело");
 	
-	public final String label;
+	private final String label;
 		
 	private CaseType(String label) {
 		 this.label = label;

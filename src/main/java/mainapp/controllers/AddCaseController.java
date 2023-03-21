@@ -15,10 +15,14 @@ import mainapp.customGUI.CustomAlert;
 import mainapp.data.ACase;
 import mainapp.data.CaseType;
 import mainapp.data.Court;
+import mainapp.data.CourtStage;
 import mainapp.data.Relation;
 import mainapp.data.Representative;
-import mainapp.helpers.DataModel;
 import mainapp.helpers.DatePickerConverter;
+import mainapp.helpers.SaveEntityException;
+import mainapp.services.CaseService;
+import mainapp.services.CourtService;
+import mainapp.services.ReprService;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
@@ -28,11 +32,17 @@ public class AddCaseController extends AbstractCaseController {
 	private Stage stage;
 
 	private ObservableList<ACase> caseList;
+	
+	private final CaseService caseService;
+	
+	private final ReprService reprService;
+	
+	private final CourtService courtService;
 
-	private final DataModel model;
-
-	public AddCaseController(DataModel model) {
-		this.model = model;
+	public AddCaseController(CaseService caseService, ReprService reprService, CourtService courtService) {
+		this.caseService = caseService;
+		this.reprService = reprService;
+		this.courtService = courtService;
 	}
 
 	@Override
@@ -45,9 +55,10 @@ public class AddCaseController extends AbstractCaseController {
 		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(CaseType.values()));
 		relationChoiceBox.setItems(FXCollections.observableArrayList(Relation.values()));
 		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> setRestrictions(newVal));
-		representativeChoiceBox.setItems(FXCollections.observableArrayList(model.getReprRepo().findAll()));
-		stageChoiceBox.setItems(FXCollections.observableArrayList(model.getStageRepo().findAll()));
-		courtComboBox.setItems(FXCollections.observableArrayList(model.getCourtRepo().findAll()));
+		representativeChoiceBox.setItems(reprService.getAllReprs().
+				sorted((r1, r2) -> r1.getName().compareTo(r2.getName())));
+		stageChoiceBox.setItems(FXCollections.observableArrayList(CourtStage.values()));
+		courtComboBox.setItems(courtService.getAllCourts());
 		courtComboBox.setConverter(new StringConverter<Court>() {
 			@Override
 			public String toString(Court court) {
@@ -101,43 +112,53 @@ public class AddCaseController extends AbstractCaseController {
 	public void saveCase(ActionEvent actionEvent) {
 		if (!isInputCorrect()) {
 			displayErrors();
-		} else {
-			Court court = courtComboBox.getValue();
-			if (model.getCourtRepo().existsByName(court.getName())) {
-				court = model.getCourtRepo().findByName(court.getName()).get();
-			} else {
-				court = model.getCourtRepo().save(court);
-			}
-			ACase newCase = new ACase(relationChoiceBox.getValue(), caseTypeChoiceBox.getValue(), description.getText(),
-					court, stageChoiceBox.getValue(), currentState.getText());
-			if (!caseNoTextField.getText().isEmpty()) {
-				newCase.setCaseNo(caseNoTextField.getText());
-			}
-			if (!plaintiffTextField.getText().isEmpty()) {
-				newCase.setPlaintiff(plaintiffTextField.getText());
-			}
-			if (!defendantTextField.getText().isEmpty()) {
-				newCase.setDefendant(defendantTextField.getText());
-			}
-			if (representativeChoiceBox.getValue() != null) {
-				newCase.setRepr(representativeChoiceBox.getValue());
-			}
-			if (currDatePicker.getValue() != null && !hourTextField.getText().isEmpty()
-					&& !minuteTextField.getText().isEmpty()) {
-				try {
-					int hours = Integer.parseInt(hourTextField.getText(), 10);
-					int mins = Integer.parseInt(minuteTextField.getText(), 10);
-					newCase.setCurrentDate(
-							DatePickerConverter.convertToTimestamp(currDatePicker.getValue(), hours, mins));
-				} catch (NumberFormatException nfe) {
-					newCase.setCurrentDate(null);
-				}
-			}
-			newCase = model.getCaseRepo().save(newCase);
-			caseList.addAll(newCase);
-			new CustomAlert("Подтверждение", "", "Дело внесено в базу данных!", ButtonType.OK).show();
-			stage.close();
+			return;
 		}
+		Court court = courtComboBox.getValue();
+		if (courtService.existsInDB(court)) {
+			court = courtService.findCourtByEntity(court);
+		} else {
+			try {
+				court = courtService.addCourt(court);
+			} catch (SaveEntityException see) {
+			new CustomAlert("Ошибка", "", "Возникла ошибка при сохранении", ButtonType.OK).show();
+			return;
+			}
+		}
+		ACase newCase = new ACase(relationChoiceBox.getValue(), caseTypeChoiceBox.getValue(), description.getText(),
+				court, stageChoiceBox.getValue(), currentState.getText());
+		if (!caseNoTextField.getText().isEmpty()) {
+			newCase.setCaseNo(caseNoTextField.getText());
+		}
+		if (!plaintiffTextField.getText().isEmpty()) {
+			newCase.setPlaintiff(plaintiffTextField.getText());
+		}
+		if (!defendantTextField.getText().isEmpty()) {
+			newCase.setDefendant(defendantTextField.getText());
+		}
+		if (representativeChoiceBox.getValue() != null) {
+			newCase.setRepr(representativeChoiceBox.getValue());
+		}
+		if (currDatePicker.getValue() != null && !hourTextField.getText().isEmpty()
+				&& !minuteTextField.getText().isEmpty()) {
+			try {
+				int hours = Integer.parseInt(hourTextField.getText(), 10);
+				int mins = Integer.parseInt(minuteTextField.getText(), 10);
+				newCase.setCurrentDate(
+						DatePickerConverter.convertToTimestamp(currDatePicker.getValue(), hours, mins));
+			} catch (NumberFormatException nfe) {
+				newCase.setCurrentDate(null);
+			}
+		}
+		try {
+			newCase = caseService.saveCase(newCase);
+		} catch (SaveEntityException see) {
+			new CustomAlert("Ошибка", "", "Возникла ошибка при сохранении", ButtonType.OK).show();
+			return;
+		}
+		caseList.add(newCase);
+		new CustomAlert("Подтверждение", "", "Дело внесено в базу данных!", ButtonType.OK).show();
+		stage.close();
 	}
 
 //	***************************************************************************

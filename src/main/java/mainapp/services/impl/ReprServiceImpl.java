@@ -24,6 +24,11 @@ public class ReprServiceImpl implements ReprService {
 	public ObservableList<Representative> getAllReprs() {
 		return FXCollections.observableArrayList(reprRepo.findAll());
 	}
+	
+	@Override
+	public Representative getRepr(Representative repr) {
+		return reprRepo.findByName(repr.getName());
+	}
 
 	@Override
 	public Representative addNewRepr(Representative newRepr) throws SaveEntityException {
@@ -48,4 +53,14 @@ public class ReprServiceImpl implements ReprService {
 		}
 	}
 
+	@Override
+	public void deleteRepr(int id) throws SaveEntityException {
+		try {
+			Representative repr = reprRepo.findById(id)
+					.orElseThrow(() -> new SaveEntityException("Representative not found in database"));
+			reprRepo.delete(repr);
+		} catch (OptimisticLockException ole) {
+			throw new SaveEntityException("An OptimisticLockException has occurred");
+		}
+	}
 }

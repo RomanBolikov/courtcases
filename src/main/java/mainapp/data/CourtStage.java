@@ -8,7 +8,7 @@ public enum CourtStage {
 	THIRD("3 инстанция"),
 	SUPREME_COURT("Верховный Суд РФ");
 
-    public final String label;
+	private final String label;
 
     private CourtStage(String label) {
         this.label = label;

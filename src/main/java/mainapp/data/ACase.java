@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+
 @Data
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
@@ -31,14 +32,12 @@ public class ACase {
 	private Integer id;
 
 	@NonNull
-	@ManyToOne
-	@JoinColumn(name = "relation", nullable = false)
-	private String relation;
+	@Column(name = "relation", nullable = false)
+	private Relation relation;
 
 	@NonNull
-	@ManyToOne
-	@JoinColumn(name = "case_type", nullable = false)
-	private String caseType;
+	@Column(name = "case_type", nullable = false)
+	private CaseType caseType;
 	
 	@NonNull
 	@Column(name = "case_title", nullable = false)
@@ -62,9 +61,8 @@ public class ACase {
 	private Representative repr;
 
 	@NonNull
-	@ManyToOne
-	@JoinColumn(name = "stage", nullable = false)
-	private String stage;
+	@Column(name = "stage", nullable = false)
+	private CourtStage stage;
 
 	@Column(name = "curr_date")
 	private Timestamp currentDate;

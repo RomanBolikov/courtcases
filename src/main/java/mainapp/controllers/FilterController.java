@@ -1,8 +1,5 @@
 package mainapp.controllers;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Component;
 
 import javafx.collections.FXCollections;
@@ -15,9 +12,15 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import mainapp.data.CaseType;
+import mainapp.data.Court;
+import mainapp.data.Relation;
+import mainapp.data.Representative;
 import mainapp.helpers.CaseFilter;
-import mainapp.helpers.DataModel;
+import mainapp.services.CourtService;
+import mainapp.services.ReprService;
 import net.rgielen.fxweaver.core.FxmlView;
+
 
 @Component
 @FxmlView("setfilters.fxml")
@@ -26,30 +29,34 @@ public class FilterController {
 	private Stage stage;
 
 	private MainController parent;
-
-	private final DataModel model;
+	
+	private final CourtService courtService;
+	
+	private final ReprService reprService;
 
 	private final CaseFilter caseFilter;
 
-	public FilterController(DataModel model, CaseFilter caseFilter) {
-		this.model = model;
+	public FilterController(CaseFilter caseFilter, CourtService courtService, ReprService reprService) {
 		this.caseFilter = caseFilter;
+		this.courtService = courtService;
+		this.reprService = reprService;
+		
 	}
 
 	@FXML
 	private GridPane gridPane;
 
 	@FXML
-	private ChoiceBox<String> caseTypeChoiceBox;
+	private ChoiceBox<CaseType> caseTypeChoiceBox;
 
 	@FXML
-	private ChoiceBox<String> relationChoiceBox;
+	private ChoiceBox<Relation> relationChoiceBox;
 
 	@FXML
-	private ChoiceBox<String> representativeChoiceBox;
+	private ChoiceBox<Representative> representativeChoiceBox;
 
 	@FXML
-	private ChoiceBox<String> courtChoiceBox;
+	private ChoiceBox<Court> courtChoiceBox;
 
 	@FXML
 	private DatePicker currDatePicker;
@@ -72,20 +79,10 @@ public class FilterController {
 		stage.setTitle("Установка фильтров в таблице");
 		stage.setResizable(false);
 		stage.setScene(new Scene(gridPane));
-		List<String> typeList = model.getCaseTypeRepo().findAll().stream().map(type -> type.toString())
-				.collect(Collectors.toList());
-		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(typeList));
-		List<String> relationList = model.getRelationRepo().findAll().stream().map(rel -> rel.toString())
-				.collect(Collectors.toList());
-		relationChoiceBox.setItems(FXCollections.observableArrayList(relationList));
-		List<String> reprList = model.getReprRepo().findAll().stream()
-				.map(repr -> repr.toString())
-				.sorted()
-				.collect(Collectors.toList());
-		representativeChoiceBox.setItems(FXCollections.observableArrayList(reprList));
-		List<String> courtList = model.getCourtRepo().findAll().stream().map(court -> court.toString())
-				.collect(Collectors.toList());
-		courtChoiceBox.setItems(FXCollections.observableArrayList(courtList));
+		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(CaseType.values()));
+		relationChoiceBox.setItems(FXCollections.observableArrayList(Relation.values()));
+		representativeChoiceBox.setItems(reprService.getAllReprs());
+		courtChoiceBox.setItems(courtService.getAllCourts());
 	}
 
 	@FXML

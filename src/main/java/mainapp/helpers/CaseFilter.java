@@ -6,6 +6,10 @@ import java.util.function.Predicate;
 import org.springframework.stereotype.Component;
 
 import mainapp.data.ACase;
+import mainapp.data.CaseType;
+import mainapp.data.Court;
+import mainapp.data.Relation;
+import mainapp.data.Representative;
 
 @Component
 public class CaseFilter implements Predicate<ACase> {
@@ -18,27 +22,27 @@ public class CaseFilter implements Predicate<ACase> {
 	private boolean acceptByPlaintiff;
 	private boolean acceptByDefendant;
 
-	private String relation = null;
-	private String type = null;
-	private String repr = null;
-	private String court = null;
+	private Relation relation = null;
+	private CaseType type = null;
+	private Representative repr = null;
+	private Court court = null;
 	private LocalDate currentDate = null;
 	private String plaintiff = null;
 	private String defendant = null;
 
-	public String getRelation() {
+	public Relation getRelation() {
 		return relation;
 	}
 
-	public String getType() {
+	public CaseType getType() {
 		return type;
 	}
 
-	public String getRepr() {
+	public Representative getRepr() {
 		return repr;
 	}
 
-	public String getCourt() {
+	public Court getCourt() {
 		return court;
 	}
 
@@ -46,19 +50,19 @@ public class CaseFilter implements Predicate<ACase> {
 		return currentDate;
 	}
 
-	public void setRelation(String relation) {
+	public void setRelation(Relation relation) {
 		this.relation = relation;
 	}
 
-	public void setType(String type) {
+	public void setType(CaseType type) {
 		this.type = type;
 	}
 
-	public void setRepr(String repr) {
+	public void setRepr(Representative repr) {
 		this.repr = repr;
 	}
 
-	public void setCourt(String court) {
+	public void setCourt(Court court) {
 		this.court = court;
 	}
 
@@ -76,10 +80,11 @@ public class CaseFilter implements Predicate<ACase> {
 
 	@Override
 	public boolean test(ACase acase) {
-		acceptByType = type == null ? true : acase.getCaseType().toString().equals(type);
-		acceptByRelation = relation == null ? true : acase.getRelation().toString().equals(relation);
-		acceptByRepr = repr == null ? true : acase.getRepr() == null ? false : acase.getRepr().toString().equals(repr);
-		acceptByCourt = court == null ? true : acase.getCourt().toString().equals(court);
+		acceptByType = type == null ? true : acase.getCaseType() == type;
+		acceptByRelation = relation == null ? true : acase.getRelation() == relation;
+		acceptByRepr = repr == null ? true : acase.getRepr() == null ? false : acase.getRepr().getName()
+				.equals(repr.getName());
+		acceptByCourt = court == null ? true : acase.getCourt().toString().equals(court.toString());
 		acceptByCurrentDate = currentDate == null ? true : acase.getCurrentDate() == null ? false
 				: DatePickerConverter.extractLocalDate(acase.getCurrentDate()).equals(currentDate);
 		acceptByPlaintiff = plaintiff == null ? true
@@ -90,5 +95,4 @@ public class CaseFilter implements Predicate<ACase> {
 		return acceptByType && acceptByRelation && acceptByRepr && acceptByCourt && acceptByCurrentDate
 				&& acceptByPlaintiff && acceptByDefendant;
 	}
-
 }

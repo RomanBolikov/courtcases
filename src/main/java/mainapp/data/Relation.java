@@ -7,7 +7,7 @@ public enum Relation {
 	CONTROLLED("Дела на контроле министерства"),
 	CRIMINAL_AND_ADMIN_OFFENCES("Уголовные дела и дела об админ. правонарушениях");
 	
-	public final String label;
+	private final String label;
 
     private Relation(String label) {
         this.label = label;

@@ -4,12 +4,9 @@ import java.io.File;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.OptimisticLockException;
-
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -37,12 +34,12 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import mainapp.customGUI.CustomAlert;
+import mainapp.customGUI.ReportTypeDialog;
 import mainapp.data.ACase;
 import mainapp.data.Representative;
 import mainapp.helpers.CaseFilter;
-import mainapp.helpers.DataModel;
+import mainapp.helpers.SaveEntityException;
 import mainapp.helpers.XLSXFileWriter;
-import mainapp.repositories.CaseRepo;
 import mainapp.services.CaseService;
 import net.rgielen.fxweaver.core.FxControllerAndView;
 import net.rgielen.fxweaver.core.FxWeaver;
@@ -52,11 +49,8 @@ import net.rgielen.fxweaver.core.FxmlView;
 @FxmlView("main1.fxml")
 public class MainController {
 
-	@Autowired
-	private ModelMapper modelMapper;
-
 	private final CaseService caseService;
-	
+
 	private ObservableList<ACase> caseList;
 
 	private final CaseFilter caseFilter;
@@ -172,6 +166,7 @@ public class MainController {
 			String repr = cdf.getValue().getRepr().toString();
 			return new SimpleStringProperty(repr);
 		});
+		reprColumn.setComparator(String::compareTo);
 		dateColumn.setCellValueFactory(cdf -> {
 			SimpleStringProperty property = new SimpleStringProperty();
 			ACase thisCase = cdf.getValue();
@@ -234,7 +229,7 @@ public class MainController {
 				}
 			};
 			row.setOnMouseClicked(evt -> {
-				if (evt.getButton().equals(MouseButton.PRIMARY) && evt.getClickCount() == 2) {
+				if (evt.getButton().equals(MouseButton.PRIMARY) && evt.getClickCount() == 2 && row.getItem() != null) {
 					editCase(new ActionEvent());
 				}
 			});
@@ -281,8 +276,6 @@ public class MainController {
 	@FXML
 	private void editCase(ActionEvent actionEvent) {
 		ACase caseToEdit = tableView.getSelectionModel().selectedItemProperty().getValue();
-		// this check is needed in case if an empty row is double-clicked accidentally or intentionally
-		if (caseToEdit == null) return;
 		if (caseToEdit.isArchive()) {
 			new CustomAlert("Редактирование дела",
 					"Для редактирования дела необходимо" + "\n" + "восстановить его из архива!", "", ButtonType.OK)
@@ -290,7 +283,7 @@ public class MainController {
 			return;
 		}
 		EditCaseController editController = fxWeaver.loadController(EditCaseController.class);
-		editController.setParent(this); // this is needed to refresh main stage TableView after editing
+//		editController.setParent(this); // this is needed to refresh main stage TableView after editing
 		editController.show(caseList, caseToEdit);
 	}
 
@@ -300,16 +293,17 @@ public class MainController {
 				ButtonType.OK, new ButtonType("Отмена", ButtonData.CANCEL_CLOSE)).showAndWait();
 		if (confirmed.isPresent() && confirmed.get() == ButtonType.OK) {
 			ACase caseToBeMoved = tableView.getSelectionModel().getSelectedItem();
+			int id = caseToBeMoved.getId();
 			caseToBeMoved.setIsArchive(true);
 			caseToBeMoved.setCurrentDate(null);
 			try {
-				ACase edited = caseRepo.save(caseToBeMoved);
+				ACase edited = caseService.saveCase(caseToBeMoved);
 				caseList.add(edited);
 				new CustomAlert("Перемещение в архив", "", "Дело перемещено в архив!", ButtonType.OK).show();
-			} catch (OptimisticLockException ole) {
+			} catch (SaveEntityException see) {
 				new CustomAlert("Обновление данных", "", "Параметры дела изменены другим пользователем!", ButtonType.OK)
 						.show();
-				caseList.add(caseRepo.findById(caseToBeMoved.getId()).get());
+				caseList.add(caseService.getCaseById(id));
 			} finally {
 				caseList.remove(caseToBeMoved);
 			}
@@ -322,37 +316,34 @@ public class MainController {
 				ButtonType.OK, new ButtonType("Отмена", ButtonData.CANCEL_CLOSE)).showAndWait();
 		if (confirmed.isPresent() && confirmed.get() == ButtonType.OK) {
 			ACase caseToRestore = tableView.getSelectionModel().getSelectedItem();
+			int id = caseToRestore.getId();
 			caseToRestore.setIsArchive(false);
 			try {
-				ACase edited = caseRepo.save(caseToRestore);
+				ACase edited = caseService.saveCase(caseToRestore);
 				caseList.add(edited);
-			} catch (OptimisticLockException ole) {
+			} catch (SaveEntityException see) {
 				new CustomAlert("Обновление данных", "", "Параметры дела изменены другим пользователем!", ButtonType.OK)
 						.show();
-				caseList.add(caseRepo.findById(caseToRestore.getId()).get());
+				caseList.add(caseService.getCaseById(id));
 			} finally {
 				caseList.remove(caseToRestore);
-				refreshTable();
+//				refreshTable();
 			}
 		}
 	}
 
-	/**
-	 * this method first requests user on where to save the report file, providing
-	 * preset directory as initial choice. Then it triggers static methods in
-	 * XLSXFileWriter helper class that return a boolean value (true for success,
-	 * false for failure), depending on latter a correspondent CustomAlert is shown
-	 * 
-	 * @param actionEvent - generated when an appropriate Button is pressesd
-	 */
 	@FXML
 	private void createReport(ActionEvent actionEvent) {
 		DirectoryChooser dialog = new DirectoryChooser();
 		dialog.setInitialDirectory(new File("C:/Prog/Java/Spring/testdir"));
 		File saveDir = dialog.showDialog(stage);
-		if (saveDir == null)
-			return;
-		boolean reportSaved = XLSXFileWriter.createReport(saveDir, model, archiveCheckbox.isSelected());
+		if (saveDir == null) return;
+		Optional<Boolean> includeAllCases = new ReportTypeDialog().showAndWait();
+		if (includeAllCases.isEmpty()) return;
+		List<ACase> casesToInclude = includeAllCases.get() 
+				? caseList.filtered(acase -> !acase.isArchive())
+				: tableView.getItems();
+		boolean reportSaved = XLSXFileWriter.createReport(saveDir, casesToInclude);
 		if (reportSaved) {
 			new CustomAlert("Сохранение отчета", "Отчет сохранен!", "", ButtonType.OK).show();
 		} else {
@@ -378,7 +369,7 @@ public class MainController {
 		} else {
 			tableView.getSelectionModel().selectedItemProperty().addListener(this::modifyArchiveButton);
 		}
-		caseFilter.setRepr(user.toString());
+		caseFilter.setRepr(user);
 		refreshTable();
 	}
 
