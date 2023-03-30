@@ -81,12 +81,12 @@ public abstract class AbstractCaseController {
 	
 	protected void setRestrictions(Relation relation) {
 		if (relation == Relation.PLAINTIFF) {
-			plaintiffTextField.setText("Минстрой края");
+			plaintiffTextField.setText("Наша компания");
 			plaintiffTextField.setDisable(true);
 			defendantTextField.setDisable(false);
 		} else if (relation == Relation.DEFENDANT) {
 			plaintiffTextField.setDisable(false);
-			defendantTextField.setText("Минстрой края");
+			defendantTextField.setText("Наша компания");
 			defendantTextField.setDisable(true);
 		} else {
 			plaintiffTextField.setDisable(false);

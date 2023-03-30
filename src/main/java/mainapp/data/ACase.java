@@ -77,6 +77,8 @@ public class ACase {
 	@Version
 	private Integer version;
 	
+	private transient boolean editable = true;
+	
 	public String toString() {
 		return title;
 	}

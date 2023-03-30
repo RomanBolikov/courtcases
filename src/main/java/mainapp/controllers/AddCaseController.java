@@ -58,7 +58,8 @@ public class AddCaseController extends AbstractCaseController {
 		representativeChoiceBox.setItems(reprService.getAllReprs().
 				sorted((r1, r2) -> r1.getName().compareTo(r2.getName())));
 		stageChoiceBox.setItems(FXCollections.observableArrayList(CourtStage.values()));
-		courtComboBox.setItems(courtService.getAllCourts());
+		courtComboBox.setItems(courtService.getAllCourts()
+				.sorted((c1, c2) -> c1.getName().compareTo(c2.getName())));
 		courtComboBox.setConverter(new StringConverter<Court>() {
 			@Override
 			public String toString(Court court) {

@@ -26,6 +26,7 @@ public class ReportTypeDialog extends Dialog<Boolean> {
 		
 		RadioButton btn2 = new RadioButton("Только выбранные дела");
 		btn2.setToggleGroup(tg);
+		btn2.setUserData("selectedCases");
 		btn2.setSelected(false);
 		
 		vbox.setAlignment(Pos.CENTER);

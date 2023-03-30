@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -46,12 +48,16 @@ import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 
 @Component
-@FxmlView("main1.fxml")
+@FxmlView("main.fxml")
 public class MainController {
 
 	private final CaseService caseService;
 
 	private ObservableList<ACase> caseList;
+	
+	private FilteredList<ACase> filteredList;
+
+	private SortedList<ACase> sortedList;
 
 	private final CaseFilter caseFilter;
 
@@ -70,6 +76,7 @@ public class MainController {
 	public MainController(CaseService caseService, FxWeaver fxWeaver, CaseFilter casefilter) {
 		this.caseService = caseService;
 		this.caseList = caseService.getAllCases();
+		this.filteredList = caseList.filtered(null);
 		this.fxWeaver = fxWeaver;
 		this.caseFilter = casefilter;
 	}
@@ -166,7 +173,6 @@ public class MainController {
 			String repr = cdf.getValue().getRepr().toString();
 			return new SimpleStringProperty(repr);
 		});
-		reprColumn.setComparator(String::compareTo);
 		dateColumn.setCellValueFactory(cdf -> {
 			SimpleStringProperty property = new SimpleStringProperty();
 			ACase thisCase = cdf.getValue();
@@ -282,8 +288,10 @@ public class MainController {
 					.show();
 			return;
 		}
+		if (!caseToEdit.isEditable()) return; // in case user incidentally tries to edit the case twice at the same time
+		caseToEdit.setEditable(false);
 		EditCaseController editController = fxWeaver.loadController(EditCaseController.class);
-//		editController.setParent(this); // this is needed to refresh main stage TableView after editing
+//		editController.setParent(this);
 		editController.show(caseList, caseToEdit);
 	}
 
@@ -337,12 +345,14 @@ public class MainController {
 		DirectoryChooser dialog = new DirectoryChooser();
 		dialog.setInitialDirectory(new File("C:/Prog/Java/Spring/testdir"));
 		File saveDir = dialog.showDialog(stage);
-		if (saveDir == null) return;
+		if (saveDir == null)
+			return;
 		Optional<Boolean> includeAllCases = new ReportTypeDialog().showAndWait();
-		if (includeAllCases.isEmpty()) return;
-		List<ACase> casesToInclude = includeAllCases.get() 
-				? caseList.filtered(acase -> !acase.isArchive())
-				: tableView.getItems();
+		if (includeAllCases.isEmpty())
+			return;
+		List<ACase> casesToInclude = includeAllCases.get()
+				? caseList.stream().filter(acase -> !acase.isArchive()).toList()
+				: tableView.getItems().stream().toList();
 		boolean reportSaved = XLSXFileWriter.createReport(saveDir, casesToInclude);
 		if (reportSaved) {
 			new CustomAlert("Сохранение отчета", "Отчет сохранен!", "", ButtonType.OK).show();
@@ -416,8 +426,10 @@ public class MainController {
 	}
 
 	public void refreshTable() {
-		tableView.setItems(
-				caseList.filtered(caseFilter.and(acase -> archiveCheckbox.isSelected() ? true : !acase.isArchive())));
+		filteredList.setPredicate(caseFilter.and(acase -> archiveCheckbox.isSelected() ? true : !acase.isArchive()));
+		sortedList = new SortedList<>(filteredList);
+		sortedList.comparatorProperty().bind(tableView.comparatorProperty());
+		tableView.setItems(sortedList);
 		tableView.sort();
 	}
 

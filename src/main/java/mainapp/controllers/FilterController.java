@@ -81,7 +81,8 @@ public class FilterController {
 		stage.setScene(new Scene(gridPane));
 		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(CaseType.values()));
 		relationChoiceBox.setItems(FXCollections.observableArrayList(Relation.values()));
-		representativeChoiceBox.setItems(reprService.getAllReprs());
+		representativeChoiceBox.setItems(reprService.getAllReprs()
+				.sorted((r1, r2) -> r1.getName().compareTo(r2.getName())));
 		courtChoiceBox.setItems(courtService.getAllCourts());
 	}
 

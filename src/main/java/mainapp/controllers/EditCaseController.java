@@ -64,9 +64,11 @@ public class EditCaseController extends AbstractCaseController {
 		stage.setScene(new Scene(gridPane));
 		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(CaseType.values()));
 		relationChoiceBox.setItems(FXCollections.observableArrayList(Relation.values()));
-		representativeChoiceBox.setItems(reprService.getAllReprs());
+		representativeChoiceBox.setItems(reprService.getAllReprs()
+				.sorted((r1, r2) -> r1.getName().compareTo(r2.getName())));
 		stageChoiceBox.setItems(FXCollections.observableArrayList(CourtStage.values()));
-		courtComboBox.setItems(courtService.getAllCourts());
+		courtComboBox.setItems(courtService.getAllCourts()
+				.sorted((c1, c2) -> c1.getName().compareTo(c2.getName())));
 		courtComboBox.setConverter(new StringConverter<Court>() {
 			@Override
 			public String toString(Court court) {
@@ -218,6 +220,7 @@ public class EditCaseController extends AbstractCaseController {
 			hourTextField.setText("");
 			minuteTextField.setText("");
 		});
+		stage.setOnHiding(e -> caseToEdit.setEditable(true));
 		stage.show();
 	}
 
