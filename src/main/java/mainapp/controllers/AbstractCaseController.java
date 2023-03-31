@@ -79,14 +79,14 @@ public abstract class AbstractCaseController {
 
 //	***************************************************************************
 	
-	protected void setRestrictions(Relation relation) {
+	protected void setRelationRestrictions(Relation relation) {
 		if (relation == Relation.PLAINTIFF) {
-			plaintiffTextField.setText("Наша компания");
+			plaintiffTextField.setText("Минстрой края");
 			plaintiffTextField.setDisable(true);
 			defendantTextField.setDisable(false);
 		} else if (relation == Relation.DEFENDANT) {
 			plaintiffTextField.setDisable(false);
-			defendantTextField.setText("Наша компания");
+			defendantTextField.setText("Минстрой края");
 			defendantTextField.setDisable(true);
 		} else {
 			plaintiffTextField.setDisable(false);
@@ -94,10 +94,21 @@ public abstract class AbstractCaseController {
 		}
 	}
 
+	protected void setCaseTypeRestrictions(CaseType caseType) {
+		if (caseType == CaseType.CRIMINAL || caseType == CaseType.ADMIN_OFFENCE) {
+			relationChoiceBox.setValue(Relation.CRIMINAL_AND_ADMIN_OFFENCES);
+			relationChoiceBox.setDisable(true);
+		} else {
+			relationChoiceBox.setDisable(false);
+			relationChoiceBox.setValue(null);
+		}
+	}
+	
 	protected boolean isInputCorrect() {
 		return relationChoiceBox.getValue() != null && caseTypeChoiceBox.getValue() != null
-				&& !description.getText().isEmpty() && courtComboBox.getValue() != null
-				&& stageChoiceBox.getValue() != null && !currentState.getText().isEmpty();
+				&& description.getText() != null && !description.getText().isEmpty() 
+				&& courtComboBox.getValue() != null	&& stageChoiceBox.getValue() != null 
+				&& currentState.getText() != null && !currentState.getText().isEmpty();
 	}
 
 	protected void displayErrors() {

@@ -53,8 +53,9 @@ public class AddCaseController extends AbstractCaseController {
 		stage.setResizable(false);
 		stage.setScene(new Scene(gridPane));
 		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(CaseType.values()));
+		caseTypeChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> setCaseTypeRestrictions(newVal));
 		relationChoiceBox.setItems(FXCollections.observableArrayList(Relation.values()));
-		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> setRestrictions(newVal));
+		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> setRelationRestrictions(newVal));
 		representativeChoiceBox.setItems(reprService.getAllReprs().
 				sorted((r1, r2) -> r1.getName().compareTo(r2.getName())));
 		stageChoiceBox.setItems(FXCollections.observableArrayList(CourtStage.values()));

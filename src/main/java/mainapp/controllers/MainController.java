@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -136,6 +137,9 @@ public class MainController {
 
 	@FXML
 	private CheckBox archiveCheckbox;
+	
+	@FXML
+	private Label numberLabel;
 
 	@FXML
 	private Button createReportButton;
@@ -244,6 +248,8 @@ public class MainController {
 		tableView.getSelectionModel().selectedItemProperty().addListener(this::enableEditButton);
 		tableView.getSortOrder().add(reprColumn);
 		archiveCheckbox.selectedProperty().addListener((obs, oldVal, newVal) -> refreshTable());
+		numberLabel.textProperty().bind(new SimpleStringProperty("Выбрано дел: ")
+				.concat(Bindings.size(filteredList).asString()));
 	}
 
 	@FXML
@@ -291,7 +297,6 @@ public class MainController {
 		if (!caseToEdit.isEditable()) return; // in case user incidentally tries to edit the case twice at the same time
 		caseToEdit.setEditable(false);
 		EditCaseController editController = fxWeaver.loadController(EditCaseController.class);
-//		editController.setParent(this);
 		editController.show(caseList, caseToEdit);
 	}
 

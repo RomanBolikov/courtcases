@@ -82,15 +82,18 @@ public class CaseFilter implements Predicate<ACase> {
 	public boolean test(ACase acase) {
 		acceptByType = type == null ? true : acase.getCaseType() == type;
 		acceptByRelation = relation == null ? true : acase.getRelation() == relation;
-		acceptByRepr = repr == null ? true : acase.getRepr() == null ? false : acase.getRepr().getName()
-				.equals(repr.getName());
+		acceptByRepr = repr == null ? true
+				: acase.getRepr() == null ? false : acase.getRepr().getName().equals(repr.getName());
 		acceptByCourt = court == null ? true : acase.getCourt().toString().equals(court.toString());
-		acceptByCurrentDate = currentDate == null ? true : acase.getCurrentDate() == null ? false
-				: DatePickerConverter.extractLocalDate(acase.getCurrentDate()).equals(currentDate);
-		acceptByPlaintiff = plaintiff == null ? true
-				: acase.getPlaintiff().toLowerCase().contains(plaintiff.toLowerCase());
-		acceptByDefendant = defendant == null ? true
-				: acase.getDefendant().toLowerCase().contains(defendant.toLowerCase());
+		acceptByCurrentDate = currentDate == null ? true
+				: acase.getCurrentDate() == null ? false
+						: DatePickerConverter.extractLocalDate(acase.getCurrentDate()).equals(currentDate);
+		acceptByPlaintiff = (plaintiff == null || plaintiff.isEmpty()) ? true
+				: acase.getPlaintiff() == null ? false
+						: acase.getPlaintiff().toLowerCase().contains(plaintiff.toLowerCase());
+		acceptByDefendant = (defendant == null || defendant.isEmpty()) ? true
+				: acase.getDefendant() == null ? false
+						: acase.getDefendant().toLowerCase().contains(defendant.toLowerCase());
 
 		return acceptByType && acceptByRelation && acceptByRepr && acceptByCourt && acceptByCurrentDate
 				&& acceptByPlaintiff && acceptByDefendant;

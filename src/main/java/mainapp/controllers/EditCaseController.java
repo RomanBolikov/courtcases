@@ -28,23 +28,20 @@ import mainapp.services.CourtService;
 import mainapp.services.ReprService;
 import net.rgielen.fxweaver.core.FxmlView;
 
-
 @Component
 @FxmlView("editcase.fxml")
 public class EditCaseController extends AbstractCaseController {
 
 	private Stage stage;
 
-//	private MainController parent;
-	
 	private ObservableList<ACase> caseList;
 
 	private ACase caseToEdit;
 
 	private final CaseService caseService;
-	
+
 	private final CourtService courtService;
-	
+
 	private final ReprService reprService;
 
 	public EditCaseController(CaseService caseService, CourtService courtService, ReprService reprService) {
@@ -64,11 +61,10 @@ public class EditCaseController extends AbstractCaseController {
 		stage.setScene(new Scene(gridPane));
 		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(CaseType.values()));
 		relationChoiceBox.setItems(FXCollections.observableArrayList(Relation.values()));
-		representativeChoiceBox.setItems(reprService.getAllReprs()
-				.sorted((r1, r2) -> r1.getName().compareTo(r2.getName())));
+		representativeChoiceBox
+				.setItems(reprService.getAllReprs().sorted((r1, r2) -> r1.getName().compareTo(r2.getName())));
 		stageChoiceBox.setItems(FXCollections.observableArrayList(CourtStage.values()));
-		courtComboBox.setItems(courtService.getAllCourts()
-				.sorted((c1, c2) -> c1.getName().compareTo(c2.getName())));
+		courtComboBox.setItems(courtService.getAllCourts().sorted((c1, c2) -> c1.getName().compareTo(c2.getName())));
 		courtComboBox.setConverter(new StringConverter<Court>() {
 			@Override
 			public String toString(Court court) {
@@ -126,18 +122,21 @@ public class EditCaseController extends AbstractCaseController {
 				return;
 			}
 			caseToEdit.setCourt(court);
-		} else if (!court.getName().equals(caseToEdit.getCourt().getName())) { 	// if such a court exists in DB then
-			caseToEdit.setCourt(courtService.findCourtByEntity(court)); 		// we simply set it as case property
+		} else if (!court.getName().equals(caseToEdit.getCourt().getName())) { // if such a court exists in DB then
+			caseToEdit.setCourt(courtService.findCourtByEntity(court)); // we simply set it as case property
 		}
-		if (!caseNoTextField.getText().isEmpty()) {
+		if ((caseToEdit.getCaseNo() == null && caseNoTextField.getText() != null
+				&& !caseNoTextField.getText().isEmpty())
+				|| (caseToEdit.getCaseNo() != null && caseNoTextField.getText() != null
+						&& !caseNoTextField.getText().equals(caseToEdit.getCaseNo()))) {
 			caseToEdit.setCaseNo(caseNoTextField.getText());
 		}
 		Representative repr = representativeChoiceBox.getValue();
-		if (!repr.getName().equals(caseToEdit.getRepr().getName())) {
+		if (repr != null && !repr.getName().equals(caseToEdit.getRepr().getName())) {
 			caseToEdit.setRepr(reprService.getRepr(repr));
 		}
-		if (currDatePicker.getValue() != null && !hourTextField.getText().isEmpty()
-				&& !minuteTextField.getText().isEmpty()) {
+		if (currDatePicker.getValue() != null && hourTextField.getText() != null && !hourTextField.getText().isEmpty()
+				&& minuteTextField.getText() != null && !minuteTextField.getText().isEmpty()) {
 			try {
 				int hours = Integer.parseInt(hourTextField.getText());
 				int mins = Integer.parseInt(minuteTextField.getText());
@@ -149,19 +148,16 @@ public class EditCaseController extends AbstractCaseController {
 		} else {
 			caseToEdit.setCurrentDate(null);
 		}
-		if (!description.getText().equals(caseToEdit.getTitle())) {
+		if (description.getText() != null && !description.getText().equals(caseToEdit.getTitle())) {
 			caseToEdit.setTitle(description.getText());
 		}
-		if (!caseNoTextField.getText().equals(caseToEdit.getCaseNo())) {
-			caseToEdit.setCaseNo(caseNoTextField.getText());
-		}
-		if (!plaintiffTextField.getText().equals(caseToEdit.getPlaintiff())) {
+		if (plaintiffTextField.getText() != null && !plaintiffTextField.getText().equals(caseToEdit.getPlaintiff())) {
 			caseToEdit.setPlaintiff(plaintiffTextField.getText());
 		}
-		if (!defendantTextField.getText().equals(caseToEdit.getDefendant())) {
+		if (defendantTextField.getText() != null && !defendantTextField.getText().equals(caseToEdit.getDefendant())) {
 			caseToEdit.setDefendant(defendantTextField.getText());
 		}
-		if (!currentState.getText().equals(caseToEdit.getCurrentState())) {
+		if (currentState.getText() != null && !currentState.getText().equals(caseToEdit.getCurrentState())) {
 			caseToEdit.setCurrentState(currentState.getText());
 		}
 		try {
@@ -174,7 +170,6 @@ public class EditCaseController extends AbstractCaseController {
 			caseList.add(caseService.getCaseById(caseToEdit.getId()));
 		} finally {
 			caseList.remove(caseToEdit);
-//			parent.refreshTable();
 			stage.close();
 		}
 	}
@@ -211,7 +206,8 @@ public class EditCaseController extends AbstractCaseController {
 		}
 
 		// adding listeners to change case properties automatically
-		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> setRestrictions(newVal));
+		caseTypeChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> setCaseTypeRestrictions(newVal));
+		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> setRelationRestrictions(newVal));
 		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setRelation(newVal));
 		caseTypeChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setCaseType(newVal));
 		representativeChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setRepr(newVal));
@@ -223,8 +219,4 @@ public class EditCaseController extends AbstractCaseController {
 		stage.setOnHiding(e -> caseToEdit.setEditable(true));
 		stage.show();
 	}
-
-//	public void setParent(MainController parent) {
-//		this.parent = parent;
-//	}
 }

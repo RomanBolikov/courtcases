@@ -1,7 +1,9 @@
 spring:
   datasource: 
-    generate-unique-name: false
-    name: mock_courtcases
+    url: jdbc:mariadb://localhost:3306/courtcases
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: root
+    password: Garant27
   jpa:
     hibernate:
       ddl-auto: none

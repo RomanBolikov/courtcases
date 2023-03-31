@@ -116,9 +116,13 @@
                   <Insets left="10.0" />
                </padding>
             </CheckBox>
+            <Label fx:id="numberLabel" text="Выбрано дел:">
+               <font>
+                  <Font name="System Bold Italic" size="14.0" />
+               </font>
+            </Label>
          </children>
       </VBox>
-      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       <TableView fx:id="tableView" style="-fx-selection-bar: #E1E1E1;" GridPane.columnSpan="4" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="courtColumn" text="Суд" />
