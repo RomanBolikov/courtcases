@@ -100,7 +100,7 @@ public abstract class AbstractCaseController {
 			relationChoiceBox.setDisable(true);
 		} else {
 			relationChoiceBox.setDisable(false);
-			relationChoiceBox.setValue(null);
+			relationChoiceBox.setValue(Relation.CONTROLLED);
 		}
 	}
 	

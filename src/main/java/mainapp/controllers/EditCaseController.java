@@ -189,6 +189,10 @@ public class EditCaseController extends AbstractCaseController {
 		defendantTextField.setText(caseToEdit.getDefendant());
 		caseTypeChoiceBox.setValue(caseToEdit.getCaseType());
 		relationChoiceBox.setValue(relation);
+		if (caseTypeChoiceBox.getValue() == CaseType.CRIMINAL 
+				|| caseTypeChoiceBox.getValue() == CaseType.ADMIN_OFFENCE) {
+			relationChoiceBox.setDisable(true);
+		}
 		representativeChoiceBox.setValue(caseToEdit.getRepr());
 		stageChoiceBox.setValue(caseToEdit.getStage());
 		courtComboBox.setValue(caseToEdit.getCourt());
