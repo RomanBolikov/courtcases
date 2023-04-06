@@ -368,13 +368,6 @@ public class MainController {
 
 //	***************************************************************************
 
-	/**
-	 * loads the main stage with a certain user (aka Representative) modifies
-	 * Archive Button, enforcing privilege restrictions for non-admin users to move
-	 * and restore cases to/from archive
-	 * 
-	 * @param user - the Representative chosen on login stage
-	 */
 	public void displayUser(Representative user) {
 		this.user = user;
 		userLabel.setText("Пользователь: " + this.user);
@@ -388,16 +381,6 @@ public class MainController {
 		refreshTable();
 	}
 
-	/**
-	 * this method is bound to a ChangeListener and modifies the Archive Button,
-	 * disabling it if no case is selected, and changing its onAction event, text
-	 * and icon depending on whether the selected case is in archive
-	 * 
-	 * @param property - selection property (i.e. the case selected)
-	 * @param oldValue - the case previously selected - this parameter is
-	 *                 disregarded
-	 * @param newValue - the case currently selected
-	 */
 	private void modifyArchiveButton(ObservableValue<? extends ACase> property, ACase oldValue, ACase newValue) {
 		if (newValue == null) {
 			archiveButton.setDisable(true);
@@ -414,14 +397,6 @@ public class MainController {
 		filterLabel.setVisible(!disable);
 	}
 
-	/**
-	 * if the case selected is an archive one, this method disables edit button
-	 * 
-	 * @param property - selection property (i.e. the case selected)
-	 * @param oldValue - the case previously selected - this parameter is
-	 *                 disregarded
-	 * @param newValue - the case currently selected
-	 */
 	private void enableEditButton(ObservableValue<? extends ACase> property, ACase oldValue, ACase newValue) {
 		if (newValue == null || newValue.isArchive()) {
 			editCaseButton.setDisable(true);

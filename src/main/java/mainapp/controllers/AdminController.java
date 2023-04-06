@@ -197,11 +197,6 @@ public class AdminController {
 		}
 	}
 
-	/**
-	 * this method simply reverts the view back to login
-	 * 
-	 * @param actionEvent - a mouse click on a corresponding button
-	 */
 	@FXML
 	private void logout(ActionEvent actionEvent) {
 		FxControllerAndView<LoginController, Parent> login = fxWeaver.load(LoginController.class);
@@ -210,11 +205,6 @@ public class AdminController {
 		stage.setScene(new Scene(login.getView().get()));
 	}
 
-	/**
-	 * @param value - whether current user has admin privileges
-	 * @return an HBox with a disabled Checkbox that's selected if this user has
-	 *         admin privileges
-	 */
 	private Node createCheckbox(Boolean value) {
 		HBox graphicContainer = new HBox();
 		graphicContainer.setAlignment(Pos.CENTER);

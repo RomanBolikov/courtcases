@@ -24,10 +24,7 @@ import org.apache.poi.ss.util.CellUtil;
 import mainapp.data.ACase;
 import mainapp.data.Relation;
 
-/**
- * A helper class providing static methods for making an .xlsx report for cases
- * in database. No instances of this class are ever created
- */
+
 public class XLSXFileWriter {
 
 	private static final String templatePath = "/mainapp/reportTemplate.xlsx";
