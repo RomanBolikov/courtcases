@@ -13,6 +13,8 @@ public interface CaseService {
 	
 	List<ACase> getCasesByRepr(Representative repr);
 	
+	List<ACase> getCasesByCaseNo(String caseNo);
+	
 	ObservableList<ACase> getCasesByRelation(String relation);
 	
 	ACase getCaseById(int id);

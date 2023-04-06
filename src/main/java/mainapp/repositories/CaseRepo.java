@@ -16,6 +16,8 @@ public interface CaseRepo extends CrudRepository<ACase, Integer> {
 	
 	List<ACase> findByRepr(Representative repr);
 	
+	List<ACase> findByCaseNo(String caseNo);
+	
 	List<ACase> findByRelation(String relation);
 	
 	@SuppressWarnings("unchecked")

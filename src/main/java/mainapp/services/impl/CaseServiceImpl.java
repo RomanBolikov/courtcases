@@ -34,6 +34,11 @@ public class CaseServiceImpl implements CaseService {
 	}
 
 	@Override
+	public List<ACase> getCasesByCaseNo(String caseNo) {
+		return caseRepo.findByCaseNo(caseNo);
+	}
+	
+	@Override
 	public ObservableList<ACase> getCasesByRelation(String relation) {
 		return FXCollections.observableArrayList(caseRepo.findByRelation(relation));
 	}
@@ -51,4 +56,6 @@ public class CaseServiceImpl implements CaseService {
 			throw new SaveEntityException("An OptimisticLockException has occurred");
 		}
 	}
+
+	
 }

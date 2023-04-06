@@ -200,9 +200,8 @@ public class EditCaseController extends AbstractCaseController {
 		description.setText(caseToEdit.getTitle());
 		currentState.setText(caseToEdit.getCurrentState());
 		currDatePicker.setValue(date);
-		if (date != null) {
-			currDatePicker.getEditor()
-					.setStyle(date.isBefore(LocalDate.now()) ? "-fx-text-fill: red" : "-fx-text-fill: black");
+		if (date != null && date.isBefore(LocalDate.now())) {
+			currDatePicker.getEditor().setStyle("-fx-text-fill: red");
 		}
 		if (time.length > 1) {
 			hourTextField.setText(String.format("%02d", time[0]));
@@ -217,6 +216,9 @@ public class EditCaseController extends AbstractCaseController {
 		representativeChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setRepr(newVal));
 		stageChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> caseToEdit.setStage(newVal));
 		currDatePicker.valueProperty().addListener((obs, oldVal, newVal) -> {
+			if (newVal != null && newVal.isAfter(LocalDate.now())) {
+				currDatePicker.getEditor().setStyle("-fx-text-fill: black");
+			}
 			hourTextField.setText("");
 			minuteTextField.setText("");
 		});

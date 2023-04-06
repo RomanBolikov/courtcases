@@ -1,5 +1,7 @@
 package mainapp.controllers;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import javafx.collections.FXCollections;
@@ -32,11 +34,11 @@ public class AddCaseController extends AbstractCaseController {
 	private Stage stage;
 
 	private ObservableList<ACase> caseList;
-	
+
 	private final CaseService caseService;
-	
+
 	private final ReprService reprService;
-	
+
 	private final CourtService courtService;
 
 	public AddCaseController(CaseService caseService, ReprService reprService, CourtService courtService) {
@@ -56,11 +58,10 @@ public class AddCaseController extends AbstractCaseController {
 		caseTypeChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> setCaseTypeRestrictions(newVal));
 		relationChoiceBox.setItems(FXCollections.observableArrayList(Relation.values()));
 		relationChoiceBox.valueProperty().addListener((obs, oldVal, newVal) -> setRelationRestrictions(newVal));
-		representativeChoiceBox.setItems(reprService.getAllReprs().
-				sorted((r1, r2) -> r1.getName().compareTo(r2.getName())));
+		representativeChoiceBox
+				.setItems(reprService.getAllReprs().sorted((r1, r2) -> r1.getName().compareTo(r2.getName())));
 		stageChoiceBox.setItems(FXCollections.observableArrayList(CourtStage.values()));
-		courtComboBox.setItems(courtService.getAllCourts()
-				.sorted((c1, c2) -> c1.getName().compareTo(c2.getName())));
+		courtComboBox.setItems(courtService.getAllCourts().sorted((c1, c2) -> c1.getName().compareTo(c2.getName())));
 		courtComboBox.setConverter(new StringConverter<Court>() {
 			@Override
 			public String toString(Court court) {
@@ -123,14 +124,26 @@ public class AddCaseController extends AbstractCaseController {
 			try {
 				court = courtService.addCourt(court);
 			} catch (SaveEntityException see) {
-			new CustomAlert("Ошибка", "", "Возникла ошибка при сохранении", ButtonType.OK).show();
-			return;
+				new CustomAlert("Ошибка", "", "Возникла ошибка при сохранении", ButtonType.OK).show();
+				return;
 			}
 		}
 		ACase newCase = new ACase(relationChoiceBox.getValue(), caseTypeChoiceBox.getValue(), description.getText(),
 				court, stageChoiceBox.getValue(), currentState.getText());
 		if (!caseNoTextField.getText().isEmpty()) {
-			newCase.setCaseNo(caseNoTextField.getText());
+			String number = caseNoTextField.getText();
+			newCase.setCaseNo(number);
+			List<ACase> casesWithSameNumber = caseList.stream()
+					.filter(c -> c.getCaseNo() != null && c.getCaseNo().equals(number)).toList();
+			if (!casesWithSameNumber.isEmpty()) {
+				for (ACase acase : casesWithSameNumber) {
+					if (acase.getCourt().equals(court)) {
+						new CustomAlert("Ошибка", "", "Дело с таким номером уже есть в данном суде!", ButtonType.OK)
+								.show();
+						return;
+					}
+				}
+			}
 		}
 		if (!plaintiffTextField.getText().isEmpty()) {
 			newCase.setPlaintiff(plaintiffTextField.getText());
@@ -146,8 +159,7 @@ public class AddCaseController extends AbstractCaseController {
 			try {
 				int hours = Integer.parseInt(hourTextField.getText(), 10);
 				int mins = Integer.parseInt(minuteTextField.getText(), 10);
-				newCase.setCurrentDate(
-						DatePickerConverter.convertToTimestamp(currDatePicker.getValue(), hours, mins));
+				newCase.setCurrentDate(DatePickerConverter.convertToTimestamp(currDatePicker.getValue(), hours, mins));
 			} catch (NumberFormatException nfe) {
 				newCase.setCurrentDate(null);
 			}
