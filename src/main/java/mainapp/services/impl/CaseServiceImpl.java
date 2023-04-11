@@ -57,5 +57,17 @@ public class CaseServiceImpl implements CaseService {
 		}
 	}
 
+	@Override
+	public void deleteCase(int id) throws SaveEntityException {
+		try {
+			ACase acase = caseRepo.findById(id)
+					.orElseThrow(() -> new SaveEntityException("Representative not found in database"));
+			caseRepo.delete(acase);
+		} catch (OptimisticLockException ole) {
+			throw new SaveEntityException("An OptimisticLockException has occurred");
+		}
+		
+	}
+
 	
 }

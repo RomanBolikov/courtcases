@@ -78,7 +78,7 @@ public class XLSXFileWriter {
 				CellUtil.createCell(row, 0, String.valueOf(currRow - 13), cs2); //!
 				CellUtil.createCell(row, 1, acase.getDefendant() == null ? "" : acase.getDefendant(), cs2);
 				CellUtil.createCell(row, 2, String.format("%s\r\n%s", 
-						acase.getCourt().toString().contains("0") ? "-" : acase.getCourt().toString(),
+						acase.getCourt().toString().contains("не определен") ? "-" : acase.getCourt().toString(),
 						acase.getCaseNo() == null ? "" : acase.getCaseNo()), cs2);
 				CellUtil.createCell(row, 3, acase.getTitle(), cs2);
 				CellUtil.createCell(row, 4, acase.getRepr() == null ? "" : acase.getRepr().toString(), cs2);
@@ -96,7 +96,7 @@ public class XLSXFileWriter {
 				CellUtil.createCell(row, 0, String.valueOf(currRow - 1), cs2);
 				CellUtil.createCell(row, 1, acase.getPlaintiff() == null ? "" : acase.getPlaintiff(), cs2);
 				CellUtil.createCell(row, 2, String.format("%s\r\n%s", 
-						acase.getCourt().toString().contains("0") ? "-" : acase.getCourt().toString(),
+						acase.getCourt().toString().contains("не определен") ? "-" : acase.getCourt().toString(),
 						acase.getCaseNo() == null ? "" : acase.getCaseNo()), cs2);
 				CellUtil.createCell(row, 3, acase.getTitle(), cs2);
 				CellUtil.createCell(row, 4, acase.getRepr() == null ? "" : acase.getRepr().toString(), cs2);
@@ -115,7 +115,7 @@ public class XLSXFileWriter {
 				CellUtil.createCell(row, 1, acase.getPlaintiff() == null ? "" : acase.getPlaintiff(), cs2);
 				CellUtil.createCell(row, 2, acase.getDefendant() == null ? "" : acase.getDefendant(), cs2);
 				CellUtil.createCell(row, 3, String.format("%s\r\n%s", 
-						acase.getCourt().toString().contains("0") ? "-" : acase.getCourt().toString(),
+						acase.getCourt().toString().contains("не определен") ? "-" : acase.getCourt().toString(),
 						acase.getCaseNo() == null ? "" : acase.getCaseNo()), cs2);
 				CellUtil.createCell(row, 4, acase.getTitle(), cs2);
 				CellUtil.createCell(row, 5, acase.getRepr() == null ? "" : acase.getRepr().toString(), cs2);
@@ -134,7 +134,7 @@ public class XLSXFileWriter {
 				CellUtil.createCell(row, 0, String.valueOf(currRow - 1), cs2);
 				CellUtil.createCell(row, 1, acase.getDefendant() == null ? "" : acase.getDefendant(), cs2);
 				CellUtil.createCell(row, 2, String.format("%s\r\n%s", 
-						acase.getCourt().toString().contains("0") ? "-" : acase.getCourt().toString(),
+						acase.getCourt().toString().contains("не определен") ? "-" : acase.getCourt().toString(),
 						acase.getCaseNo() == null ? "" : acase.getCaseNo()), cs2);
 				CellUtil.createCell(row, 3, acase.getTitle(), cs2);
 				CellUtil.createCell(row, 4, acase.getRepr() == null ? "" : acase.getRepr().toString(), cs2);
@@ -153,7 +153,7 @@ public class XLSXFileWriter {
 				CellUtil.createCell(row, 1, acase.getPlaintiff() == null ? "" : acase.getPlaintiff(), cs2);
 				CellUtil.createCell(row, 2, acase.getDefendant() == null ? "" : acase.getDefendant(), cs2);
 				CellUtil.createCell(row, 3, String.format("%s\r\n%s", 
-						acase.getCourt().toString().contains("0") ? "-" : acase.getCourt().toString(),
+						acase.getCourt().toString().contains("не определен") ? "-" : acase.getCourt().toString(),
 						acase.getCaseNo() == null ? "" : acase.getCaseNo()), cs2);
 				CellUtil.createCell(row, 4, acase.getTitle(), cs2);
 				CellUtil.createCell(row, 5, acase.getRepr() == null ? "" : acase.getRepr().toString(), cs2);

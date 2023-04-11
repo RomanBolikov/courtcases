@@ -1,7 +1,6 @@
 package mainapp.controllers;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -66,7 +65,7 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 
 	@FXML
 	private void chooseUser(ActionEvent actionEvent) {
-		choiceDialog = new CustomChoiceDialog(reprService.getAllReprs());
+		choiceDialog = new CustomChoiceDialog(reprService);
 		DialogPane dp = choiceDialog.getDialogPane();
 		Button okButton = (Button) dp.lookupButton(ButtonType.OK);
 		okButton.setOnAction(this::promptLogin);
@@ -77,11 +76,7 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 
 	@FXML
 	private void loginAsAdmin(ActionEvent actionEvent) {
-		choiceDialog = new CustomChoiceDialog(
-				reprService.getAllReprs().stream()
-				.filter(repr -> repr.isAdmin())
-				.sorted((r1, r2) -> r1.getName().compareTo(r2.getName()))
-				.collect(Collectors.toList()));
+		choiceDialog = new CustomChoiceDialog(reprService);
 		DialogPane dp = choiceDialog.getDialogPane();
 		Button okButton = (Button) dp.lookupButton(ButtonType.OK);
 		okButton.setOnAction(this::promptLoginAsAdmin);
@@ -108,7 +103,7 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 		Representative admin = choiceDialog.getSelectedItem();
 		if (!admin.isAdmin()) {
 			new CustomAlert("Ошибка доступа", "Данный пользователь не наделен правами администратора!", "",
-					ButtonType.OK).showAndWait();
+					ButtonType.OK).show();
 		} else {
 			Dialog<String> prompt = new PasswordInputDialog();
 			prompt.setHeaderText("Ввведите пароль");

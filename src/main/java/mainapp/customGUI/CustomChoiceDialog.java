@@ -1,6 +1,5 @@
 package mainapp.customGUI;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -20,7 +19,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import mainapp.data.Representative;
-import mainapp.repositories.RepresentativeRepo;
+import mainapp.helpers.SaveEntityException;
+import mainapp.services.ReprService;
 
 public class CustomChoiceDialog extends Dialog<Representative> {
 
@@ -32,13 +32,15 @@ public class CustomChoiceDialog extends Dialog<Representative> {
 
 	private final Button changePasswordButton;
 
-	private RepresentativeRepo reprRepo;
+	private ReprService reprService;
 
-	public CustomChoiceDialog() {
-		this(null);
-	}
+//	public CustomChoiceDialog() {
+//		this(null);
+//	}
 
-	public CustomChoiceDialog(List<Representative> list) {
+	public CustomChoiceDialog(ReprService reprService) {
+
+		this.reprService = reprService;
 
 		final DialogPane dialogPane = getDialogPane();
 
@@ -73,10 +75,8 @@ public class CustomChoiceDialog extends Dialog<Representative> {
 		comboBox = new ComboBox<Representative>();
 
 		comboBox.setMinWidth(MIN_WIDTH);
-		
-		list.sort((r1, r2) -> r1.getName().compareTo(r2.getName()));
 
-		comboBox.getItems().addAll(list);
+		comboBox.getItems().addAll(reprService.getAllReprs().sorted((r1, r2) -> r1.getName().compareTo(r2.getName())));
 
 		comboBox.setMaxWidth(Double.MAX_VALUE);
 
@@ -85,9 +85,9 @@ public class CustomChoiceDialog extends Dialog<Representative> {
 		GridPane.setFillWidth(comboBox, true);
 
 		comboBox.getSelectionModel().selectFirst();
-		
-		comboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> 
-			changePasswordButton.setDisable(newVal.isAdmin() ? false : true));
+
+		comboBox.getSelectionModel().selectedItemProperty()
+				.addListener((obs, oldVal, newVal) -> changePasswordButton.setDisable(newVal.isAdmin() ? false : true));
 
 		updateGrid();
 
@@ -127,22 +127,29 @@ public class CustomChoiceDialog extends Dialog<Representative> {
 		Dialog<String> prompt = new PasswordChangeDialog(user.getPassword());
 		prompt.setHeaderText("Введите пароль");
 		CustomAlert alert = new CustomAlert("Ошибка", "", "Неверный ввод!",
-				new ButtonType("Повторить", ButtonData.OK_DONE),
-				new ButtonType("Закрыть", ButtonData.CANCEL_CLOSE));
+				new ButtonType("Повторить", ButtonData.OK_DONE), new ButtonType("Закрыть", ButtonData.CANCEL_CLOSE));
 		while (true) {
 			Optional<String> newPassword = prompt.showAndWait();
 			if (newPassword.isPresent()) {
 				if (!newPassword.get().equals("invalid")) {
 					String pswHash = BCrypt.hashpw(newPassword.get(), BCrypt.gensalt(4));
 					user.setPassword(pswHash);
-					reprRepo.save(user);
+					try {
+						reprService.updateRepr(user.getId(), user);
+					} catch (SaveEntityException see) {
+						new CustomAlert("Ошибка", "", "Возникла ошибка при сохранении нового пользователя",
+								ButtonType.OK).show();
+						return;
+					}
 					new CustomAlert("Подтверждение", "", "Пароль успешно изменен!", ButtonType.OK).show();
 					break;
 				} else {
 					Optional<ButtonType> retry = alert.showAndWait();
-					if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE) break;
-				} 
-			} else break;
+					if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE)
+						break;
+				}
+			} else
+				break;
 		}
 	}
 }

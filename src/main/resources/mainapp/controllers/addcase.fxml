@@ -195,7 +195,7 @@
       </HBox>
       <VBox alignment="CENTER" spacing="30.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="7" GridPane.valignment="CENTER">
          <children>
-            <Label alignment="CENTER" text="Поля красного цвета обязательны для заполнения!" textFill="#dc0d0d">
+            <Label fx:id="requiredFields" alignment="CENTER" text="Поля красного цвета обязательны для заполнения!" textFill="#dc0d0d">
                <font>
                   <Font name="Arial Unicode MS" size="14.0" />
                </font>

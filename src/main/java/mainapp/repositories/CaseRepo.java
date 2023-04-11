@@ -24,4 +24,7 @@ public interface CaseRepo extends CrudRepository<ACase, Integer> {
 	@Lock(value = LockModeType.OPTIMISTIC_FORCE_INCREMENT)
 	ACase save (ACase entity);
 	
+	@Lock(value = LockModeType.OPTIMISTIC)
+	void delete(ACase entity);
+	
 }

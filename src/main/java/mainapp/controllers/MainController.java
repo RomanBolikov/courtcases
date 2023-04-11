@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
 import javafx.beans.binding.Bindings;
@@ -23,6 +24,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
 import javafx.scene.control.TableCell;
@@ -37,6 +39,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import mainapp.customGUI.CustomAlert;
+import mainapp.customGUI.PasswordInputDialog;
 import mainapp.customGUI.ReportTypeDialog;
 import mainapp.data.ACase;
 import mainapp.data.Representative;
@@ -55,7 +58,7 @@ public class MainController {
 	private final CaseService caseService;
 
 	private ObservableList<ACase> caseList;
-	
+
 	private FilteredList<ACase> filteredList;
 
 	private SortedList<ACase> sortedList;
@@ -72,7 +75,7 @@ public class MainController {
 			this.getClass().getResource("/mainapp/images/restore.png").toExternalForm());
 
 	private final Image removeIcon = new Image(
-			this.getClass().getResource("/mainapp/images/remove.png").toExternalForm());
+			this.getClass().getResource("/mainapp/images/archive.png").toExternalForm());
 
 	public MainController(CaseService caseService, FxWeaver fxWeaver, CaseFilter casefilter) {
 		this.caseService = caseService;
@@ -130,6 +133,9 @@ public class MainController {
 	private ImageView archiveIcon;
 
 	@FXML
+	private Button deleteCaseButton;
+
+	@FXML
 	private Button applyFilterButton;
 
 	@FXML
@@ -137,7 +143,7 @@ public class MainController {
 
 	@FXML
 	private CheckBox archiveCheckbox;
-	
+
 	@FXML
 	private Label numberLabel;
 
@@ -151,25 +157,30 @@ public class MainController {
 	@FXML
 	public void initialize() {
 		titleColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getTitle()));
+		titleColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.37));
 		courtColumn.setCellValueFactory(cdf -> new SimpleStringProperty(cdf.getValue().getCourt().toString()));
+		courtColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.14));
 		numberColumn.setCellValueFactory(cdf -> {
 			SimpleStringProperty property = new SimpleStringProperty();
 			String caseNo = cdf.getValue().getCaseNo();
 			property.setValue(caseNo == null ? "" : caseNo);
 			return property;
 		});
+		numberColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.07));
 		plaintiffColumn.setCellValueFactory(cdf -> {
 			SimpleStringProperty property = new SimpleStringProperty();
 			String plaintiff = cdf.getValue().getPlaintiff();
 			property.setValue(plaintiff == null ? "" : plaintiff);
 			return property;
 		});
+		plaintiffColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.14));
 		defendantColumn.setCellValueFactory(cdf -> {
 			SimpleStringProperty property = new SimpleStringProperty();
 			String defendant = cdf.getValue().getDefendant();
 			property.setValue(defendant == null ? "" : defendant);
 			return property;
 		});
+		defendantColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.14));
 		reprColumn.setCellValueFactory(cdf -> {
 			if (cdf.getValue().getRepr() == null) {
 				return new SimpleStringProperty("");
@@ -177,6 +188,7 @@ public class MainController {
 			String repr = cdf.getValue().getRepr().toString();
 			return new SimpleStringProperty(repr);
 		});
+		reprColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.07));
 		dateColumn.setCellValueFactory(cdf -> {
 			SimpleStringProperty property = new SimpleStringProperty();
 			ACase thisCase = cdf.getValue();
@@ -221,6 +233,7 @@ public class MainController {
 				return cell;
 			};
 		});
+		dateColumn.prefWidthProperty().bind(tableView.widthProperty().multiply(0.07));
 		// setting rows displayed in green for archived cases and make rows editable by
 		// double-clicking
 		tableView.setRowFactory(tv -> {
@@ -245,11 +258,11 @@ public class MainController {
 			});
 			return row;
 		});
-		tableView.getSelectionModel().selectedItemProperty().addListener(this::enableEditButton);
+		tableView.getSelectionModel().selectedItemProperty().addListener(this::enableButtons);
 		tableView.getSortOrder().add(reprColumn);
 		archiveCheckbox.selectedProperty().addListener((obs, oldVal, newVal) -> refreshTable());
-		numberLabel.textProperty().bind(new SimpleStringProperty("Выбрано дел: ")
-				.concat(Bindings.size(filteredList).asString()));
+		numberLabel.textProperty()
+				.bind(new SimpleStringProperty("Выбрано дел: ").concat(Bindings.size(filteredList).asString()));
 	}
 
 	@FXML
@@ -288,13 +301,8 @@ public class MainController {
 	@FXML
 	private void editCase(ActionEvent actionEvent) {
 		ACase caseToEdit = tableView.getSelectionModel().selectedItemProperty().getValue();
-		if (caseToEdit.isArchive()) {
-			new CustomAlert("Редактирование дела",
-					"Для редактирования дела необходимо" + "\n" + "восстановить его из архива!", "", ButtonType.OK)
-					.show();
+		if (!caseToEdit.isEditable())
 			return;
-		}
-		if (!caseToEdit.isEditable()) return; // in case user incidentally tries to edit the case twice at the same time
 		caseToEdit.setEditable(false);
 		EditCaseController editController = fxWeaver.loadController(EditCaseController.class);
 		editController.show(caseList, caseToEdit);
@@ -340,7 +348,40 @@ public class MainController {
 				caseList.add(caseService.getCaseById(id));
 			} finally {
 				caseList.remove(caseToRestore);
-//				refreshTable();
+			}
+		}
+	}
+
+	@FXML
+	private void deleteCase(ActionEvent actionEvent) {
+		Optional<ButtonType> confirmed = new CustomAlert("Подтверждение", "Вы уверены, что хотите удалить дело?", "",
+				ButtonType.OK, new ButtonType("Отмена", ButtonData.CANCEL_CLOSE)).showAndWait();
+		if (confirmed.isEmpty() || confirmed.get().getButtonData() == ButtonData.CANCEL_CLOSE)
+			return;
+		Dialog<String> prompt = new PasswordInputDialog();
+		prompt.setHeaderText("Ввведите пароль");
+		CustomAlert alert = new CustomAlert("Ошибка ввода", "Введен неверный пароль!", "",
+				new ButtonType("Повторить", ButtonData.OK_DONE), new ButtonType("Закрыть", ButtonData.CANCEL_CLOSE));
+		while (true) {
+			Optional<String> input = prompt.showAndWait();
+			if (input.isEmpty())
+				break;
+			if (BCrypt.checkpw(input.get(), user.getPassword())) {
+				ACase caseToBeDeleted = tableView.getSelectionModel().getSelectedItem();
+				int id = caseToBeDeleted.getId();
+				try {
+					caseService.deleteCase(id);
+					caseList.remove(caseToBeDeleted);
+					new CustomAlert("Удаление дела", "", "Дело удалено!", ButtonType.OK).show();
+					break;
+				} catch (SaveEntityException see) {
+					new CustomAlert("Удаление дела", "", "Произошла ошибка базы данных!", ButtonType.OK).show();
+					break;
+				}
+			} else {
+				Optional<ButtonType> retry = alert.showAndWait();
+				if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE)
+					break;
 			}
 		}
 	}
@@ -397,11 +438,20 @@ public class MainController {
 		filterLabel.setVisible(!disable);
 	}
 
-	private void enableEditButton(ObservableValue<? extends ACase> property, ACase oldValue, ACase newValue) {
-		if (newValue == null || newValue.isArchive()) {
+	private void enableButtons(ObservableValue<? extends ACase> property, ACase oldValue, ACase newValue) {
+		if (newValue == null) {
 			editCaseButton.setDisable(true);
+			deleteCaseButton.setDisable(true);
+		} else if (newValue.isArchive()) {
+			editCaseButton.setDisable(true);
+			if (user.isAdmin()) {
+				deleteCaseButton.setDisable(false);
+			}
 		} else {
 			editCaseButton.setDisable(false);
+			if (user.isAdmin()) {
+				deleteCaseButton.setDisable(false);
+			}
 		}
 	}
 

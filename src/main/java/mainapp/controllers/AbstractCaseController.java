@@ -7,6 +7,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -63,6 +64,9 @@ public abstract class AbstractCaseController {
 
 	@FXML
 	protected TextArea currentState;
+	
+	@FXML
+	protected Label requiredFields;
 
 	@FXML
 	protected Button saveButton;
@@ -112,6 +116,6 @@ public abstract class AbstractCaseController {
 	}
 
 	protected void displayErrors() {
-		new CustomAlert("Ошибка ввода", "", "Проверьте заполнение полей!", ButtonType.OK).show();
+		new CustomAlert("Ошибка ввода", "", "Проверьте заполнение обязательных полей!", ButtonType.OK).show();
 	}
 }

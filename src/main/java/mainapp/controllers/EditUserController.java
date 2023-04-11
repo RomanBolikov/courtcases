@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextFormatter;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mainapp.customGUI.CustomAlert;
 import mainapp.data.Representative;
@@ -58,6 +59,7 @@ public class EditUserController extends AbstractUserController {
 		label.setText("Данные пользователя " + userToEdit.getName() + ":");
 		textField.setText(userToEdit.getName());
 		checkBox.setSelected(userToEdit.isAdmin() ? true : false);
+		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.showAndWait();
 		if (unchanged) {
 			return null;

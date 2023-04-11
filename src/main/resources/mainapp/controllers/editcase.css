@@ -1,0 +1,7 @@
+.combo-box:disabled, .combo-box:disabled > *,
+.choice-box:disabled, .choice-box:disabled > *,
+.text-field:disabled,
+.text-area:disabled {
+  -fx-opacity: 1.0 ;
+  opacity: 1.0 ;
+}

@@ -10,8 +10,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextFormatter;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import mainapp.customGUI.CustomAlert;
@@ -32,6 +34,9 @@ import net.rgielen.fxweaver.core.FxmlView;
 @FxmlView("editcase.fxml")
 public class EditCaseController extends AbstractCaseController {
 
+	@FXML
+	private Button unlockEditButton;
+	
 	private Stage stage;
 
 	private ObservableList<ACase> caseList;
@@ -58,6 +63,7 @@ public class EditCaseController extends AbstractCaseController {
 		this.stage = new Stage();
 		stage.setTitle("Редактирование дела");
 		stage.setResizable(false);
+		gridPane.getStylesheets().add(getClass().getResource("/mainapp/controllers/editcase.css").toExternalForm());
 		stage.setScene(new Scene(gridPane));
 		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(CaseType.values()));
 		relationChoiceBox.setItems(FXCollections.observableArrayList(Relation.values()));
@@ -82,7 +88,7 @@ public class EditCaseController extends AbstractCaseController {
 		// set restrictions on inputs into hour and minute textfields
 		hourTextField.focusedProperty().addListener((obs, oldValue, newValue) -> {
 			if (!newValue) {
-				if (!hourTextField.getText().matches("[0-1][0-9]")) {
+				if (!hourTextField.getText().matches("^(0?9|1[0-7])$")) {
 					hourTextField.setText("");
 					new CustomAlert("Ошибка ввода", "", "Неверный ввод в поле \"часы\"", ButtonType.OK).show();
 				}
@@ -106,6 +112,25 @@ public class EditCaseController extends AbstractCaseController {
 				new TextFormatter<String>(change -> change.getControlNewText().length() <= 300 ? change : null));
 	}
 
+	@FXML
+	public void unlockEdit(ActionEvent actionEvent) {
+		caseTypeChoiceBox.setDisable(false);
+		relationChoiceBox.setDisable(false);
+		representativeChoiceBox.setDisable(false);
+		courtComboBox.setDisable(false);
+		caseNoTextField.setDisable(false);
+		stageChoiceBox.setDisable(false);
+		currDatePicker.setDisable(false);
+		hourTextField.setDisable(false);
+		minuteTextField.setDisable(false);
+		description.setDisable(false);
+		plaintiffTextField.setDisable(false);
+		defendantTextField.setDisable(false);
+		currentState.setDisable(false);
+		saveButton.setDisable(false);
+		requiredFields.setVisible(true);
+	}
+	
 	@Override
 	@FXML
 	public void saveCase(ActionEvent actionEvent) {
@@ -113,7 +138,7 @@ public class EditCaseController extends AbstractCaseController {
 			displayErrors();
 			return;
 		}
-		Court court = courtComboBox.getValue(); // what was specified by user
+		Court court = courtComboBox.getValue();
 		if (!courtService.existsInDB(court)) {
 			try {
 				court = courtService.addCourt(court);
@@ -122,8 +147,8 @@ public class EditCaseController extends AbstractCaseController {
 				return;
 			}
 			caseToEdit.setCourt(court);
-		} else if (!court.getName().equals(caseToEdit.getCourt().getName())) { // if such a court exists in DB then
-			caseToEdit.setCourt(courtService.findCourtByEntity(court)); // we simply set it as case property
+		} else if (!court.getName().equals(caseToEdit.getCourt().getName())) { 
+			caseToEdit.setCourt(courtService.findCourtByEntity(court)); 
 		}
 		if ((caseToEdit.getCaseNo() == null && caseNoTextField.getText() != null
 				&& !caseNoTextField.getText().isEmpty())
@@ -189,7 +214,7 @@ public class EditCaseController extends AbstractCaseController {
 		defendantTextField.setText(caseToEdit.getDefendant());
 		caseTypeChoiceBox.setValue(caseToEdit.getCaseType());
 		relationChoiceBox.setValue(relation);
-		if (caseTypeChoiceBox.getValue() == CaseType.CRIMINAL 
+		if (caseTypeChoiceBox.getValue() == CaseType.CRIMINAL
 				|| caseTypeChoiceBox.getValue() == CaseType.ADMIN_OFFENCE) {
 			relationChoiceBox.setDisable(true);
 		}
@@ -222,7 +247,9 @@ public class EditCaseController extends AbstractCaseController {
 			hourTextField.setText("");
 			minuteTextField.setText("");
 		});
+		unlockEditButton.setDisable(caseToEdit.isArchive());
 		stage.setOnHiding(e -> caseToEdit.setEditable(true));
+		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.show();
 	}
 }

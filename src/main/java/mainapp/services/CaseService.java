@@ -21,4 +21,6 @@ public interface CaseService {
 	
 	ACase saveCase(ACase acase) throws SaveEntityException;
 	
+	void deleteCase(int id) throws SaveEntityException;
+
 }

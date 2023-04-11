@@ -12,6 +12,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import mainapp.customGUI.CustomAlert;
 import mainapp.customGUI.PasswordSetDialog;
@@ -42,7 +43,7 @@ public class AddUserController extends AbstractUserController {
 			new CustomAlert("Ошибка ввода", "", "Проверьте ввод Ф.И.О. сотрудника!", ButtonType.OK).show();
 		} else {
 			newUser = new Representative(input);
-			newUser.setIsAdmin(checkBox.isSelected() ? true : false);
+			newUser.setIsAdmin(checkBox.isSelected());
 			if (newUser.isAdmin()) {
 				Dialog<String> prompt = new PasswordSetDialog();
 				prompt.setHeaderText("Установите пароль");
@@ -75,6 +76,7 @@ public class AddUserController extends AbstractUserController {
 	}
 
 	public Optional<Representative> showAndWait() {
+		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.showAndWait();
 		return Optional.ofNullable(newUser);
 	}
