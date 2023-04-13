@@ -40,6 +40,8 @@ public class EditCaseController extends AbstractCaseController {
 	private Stage stage;
 
 	private ObservableList<ACase> caseList;
+	
+	private Representative user;
 
 	private ACase caseToEdit;
 
@@ -103,7 +105,9 @@ public class EditCaseController extends AbstractCaseController {
 	public void unlockEdit(ActionEvent actionEvent) {
 		caseTypeChoiceBox.setDisable(false);
 		relationChoiceBox.setDisable(false);
-		representativeChoiceBox.setDisable(false);
+		if (user.isAdmin()) {
+			representativeChoiceBox.setDisable(false);
+		}
 		courtComboBox.setDisable(false);
 		caseNoTextField.setDisable(false);
 		stageChoiceBox.setDisable(false);
@@ -188,9 +192,10 @@ public class EditCaseController extends AbstractCaseController {
 
 //	***************************************************************************
 
-	public void show(ObservableList<ACase> caseList, ACase caseToEdit) {
+	public void show(ObservableList<ACase> caseList, Representative user, ACase caseToEdit) {
 		this.caseList = caseList;
 		this.caseToEdit = caseToEdit;
+		this.user = user;
 		Relation relation = caseToEdit.getRelation();
 		Timestamp timestamp = caseToEdit.getCurrentDate();
 		LocalDate date = DatePickerConverter.extractLocalDate(timestamp);

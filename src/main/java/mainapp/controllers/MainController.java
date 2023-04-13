@@ -305,7 +305,7 @@ public class MainController {
 			return;
 		caseToEdit.setEditable(false);
 		EditCaseController editController = fxWeaver.loadController(EditCaseController.class);
-		editController.show(caseList, caseToEdit);
+		editController.show(caseList, user, caseToEdit);
 	}
 
 	@FXML
