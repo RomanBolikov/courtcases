@@ -1,9 +1,9 @@
 spring:
   datasource: 
-    url: jdbc:mariadb://localhost:3306/courtcases
+    url: jdbc:mariadb://court:3306/courtcases
     driver-class-name: org.mariadb.jdbc.Driver
     username: root
-    password: Garant27
+    password: 123456Aa
   jpa:
     hibernate:
       ddl-auto: none

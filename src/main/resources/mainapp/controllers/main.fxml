@@ -15,127 +15,149 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<GridPane nodeOrientation="LEFT_TO_RIGHT" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mainapp.controllers.MainController">
-  <columnConstraints>
-      <ColumnConstraints hgrow="NEVER" maxWidth="1088.8" minWidth="10.0" prefWidth="142.133349609375" />
-      <ColumnConstraints hgrow="NEVER" maxWidth="1088.8" minWidth="10.0" prefWidth="127.46669921875" />
-      <ColumnConstraints hgrow="NEVER" maxWidth="1088.8" minWidth="10.0" prefWidth="127.46669921875" />
-    <ColumnConstraints hgrow="SOMETIMES" />
-  </columnConstraints>
-  <rowConstraints>
-    <RowConstraints fillHeight="false" maxHeight="246.79996337890623" minHeight="0.0" prefHeight="68.00000762939453" valignment="CENTER" vgrow="NEVER" />
-    <RowConstraints fillHeight="false" maxHeight="512.8" minHeight="10.0" prefHeight="69.59999237060546" vgrow="NEVER" />
-      <RowConstraints maxHeight="596.0000030517579" minHeight="10.0" prefHeight="566.4000137329101" vgrow="ALWAYS" />
-  </rowConstraints>
+
+<VBox xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mainapp.controllers.MainController">
    <children>
-      <HBox alignment="BOTTOM_RIGHT" spacing="50.0" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
-         <GridPane.margin>
-            <Insets />
-         </GridPane.margin>
+      <GridPane centerShape="false" nodeOrientation="LEFT_TO_RIGHT" VBox.vgrow="NEVER">
+        <columnConstraints>
+            <ColumnConstraints hgrow="NEVER" maxWidth="1088.8" minWidth="10.0" prefWidth="142.133349609375" />
+            <ColumnConstraints hgrow="NEVER" maxWidth="1088.8" minWidth="10.0" prefWidth="127.46669921875" />
+            <ColumnConstraints hgrow="NEVER" maxWidth="1088.8" minWidth="10.0" prefWidth="127.46669921875" />
+          <ColumnConstraints hgrow="SOMETIMES" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints fillHeight="false" maxHeight="246.79996337890623" minHeight="0.0" prefHeight="68.00000762939453" valignment="CENTER" vgrow="NEVER" />
+          <RowConstraints fillHeight="false" maxHeight="512.8" minHeight="10.0" prefHeight="69.59999237060546" vgrow="NEVER" />
+        </rowConstraints>
          <children>
-            <Button fx:id="changeUser" mnemonicParsing="false" onAction="#changeUser" text="Сменить пользователя">
-               <font>
-                  <Font name="Arial Unicode MS" size="14.0" />
-               </font>
-            </Button>
-            <Label id="userLabel" fx:id="userLabel" text="Пользователь: " textFill="#491ce8ed">
-               <font>
-                  <Font name="Arial Unicode MS" size="18.0" />
-               </font>
+            <HBox alignment="BOTTOM_RIGHT" spacing="50.0" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+               <children>
+                  <Button fx:id="changeUser" mnemonicParsing="false" onAction="#changeUser" text="Сменить пользователя">
+                     <font>
+                        <Font name="Arial Unicode MS" size="14.0" />
+                     </font>
+                  </Button>
+                  <Label id="userLabel" fx:id="userLabel" text="Пользователь: " textFill="#491ce8ed">
+                     <font>
+                        <Font name="Arial Unicode MS" size="18.0" />
+                     </font>
+                     <padding>
+                        <Insets right="20.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox spacing="10.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+               <children>
+                  <Button fx:id="addCaseButton" contentDisplay="TOP" mnemonicParsing="false" onAction="#addCase" prefHeight="60.0" prefWidth="80.0" text="Добавить">
+                     <font>
+                        <Font name="Arial Unicode MS" size="12.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/add.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Button fx:id="editCaseButton" contentDisplay="TOP" disable="true" mnemonicParsing="false" onAction="#editCase" prefHeight="60.0" prefWidth="80.0" text="Изменить" textAlignment="CENTER" wrapText="true">
+                     <font>
+                        <Font name="Arial Unicode MS" size="12.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/edit.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                <Button fx:id="archiveButton" contentDisplay="TOP" disable="true" mnemonicParsing="false" prefHeight="60.0" prefWidth="80.0" text="В архив">
+                     <font>
+                        <Font name="Arial Unicode MS" size="12.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fx:id="archiveIcon" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                        	<image>
+                              <Image url="@../images/archive.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Button fx:id="deleteCaseButton" contentDisplay="TOP" disable="true" mnemonicParsing="false" onAction="#deleteCase" prefHeight="60.0" prefWidth="80.0" text="Удалить" textAlignment="CENTER" wrapText="true">
+                     <font>
+                        <Font name="Arial Unicode MS" size="12.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fx:id="archiveIcon1" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/remove.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Button fx:id="createReportButton" contentDisplay="TOP" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#createReport" prefHeight="60.0" prefWidth="80.0" text="Отчет">
+                     <font>
+                        <Font name="Arial Unicode MS" size="14.0" />
+                     </font>
+                     <graphic>
+                        <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/excel.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+               </children>
                <padding>
-                  <Insets right="20.0" />
+                  <Insets right="10.0" />
                </padding>
-            </Label>
-         </children>
-      </HBox>
-      <HBox spacing="10.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
-         <children>
-            <Button fx:id="addCaseButton" contentDisplay="TOP" mnemonicParsing="false" onAction="#addCase" prefHeight="60.0" prefWidth="80.0" text="Добавить">
-               <font>
-                  <Font name="Arial Unicode MS" size="12.0" />
-               </font>
-               <graphic>
-                  <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/add.png" />
-                     </image>
-                  </ImageView>
-               </graphic>
-            </Button>
-            <Button fx:id="editCaseButton" contentDisplay="TOP" disable="true" mnemonicParsing="false" onAction="#editCase" prefHeight="60.0" prefWidth="80.0" text="Изменить" textAlignment="CENTER" wrapText="true">
-               <font>
-                  <Font name="Arial Unicode MS" size="12.0" />
-               </font>
-               <graphic>
-                  <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/edit.png" />
-                     </image>
-                  </ImageView>
-               </graphic>
-            </Button>
-          <Button fx:id="archiveButton" contentDisplay="TOP" disable="true" mnemonicParsing="false" prefHeight="60.0" prefWidth="80.0" text="В архив">
-               <font>
-                  <Font name="Arial Unicode MS" size="12.0" />
-               </font>
-               <graphic>
-                  <ImageView fx:id="archiveIcon" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                  	<image>
-                        <Image url="@../images/archive.png" />
-                     </image>
-                  </ImageView>
-               </graphic>
-            </Button>
-            <Button fx:id="deleteCaseButton" contentDisplay="TOP" disable="true" mnemonicParsing="false" onAction="#deleteCase" prefHeight="60.0" prefWidth="80.0" text="Удалить" textAlignment="CENTER" wrapText="true">
-               <font>
-                  <Font name="Arial Unicode MS" size="12.0" />
-               </font>
-               <graphic>
-                  <ImageView fx:id="archiveIcon1" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/remove.png" />
-                     </image>
-                  </ImageView>
-               </graphic>
-            </Button>
-            <Button fx:id="createReportButton" contentDisplay="TOP" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#createReport" prefHeight="60.0" prefWidth="80.0" text="Отчет">
-               <font>
-                  <Font name="Arial Unicode MS" size="14.0" />
-               </font>
-               <graphic>
-                  <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@../images/excel.png" />
-                     </image>
-                  </ImageView>
-               </graphic>
-            </Button>
-         </children>
-         <padding>
-            <Insets right="10.0" />
-         </padding>
-         <GridPane.margin>
-            <Insets />
-         </GridPane.margin>
-      </HBox>
-      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.columnSpan="2" GridPane.rowIndex="1">
-         <children>
-            <CheckBox fx:id="archiveCheckbox" alignment="CENTER" mnemonicParsing="false" text="Показать архивные дела" textAlignment="CENTER" wrapText="true">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </HBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" GridPane.columnSpan="2" GridPane.rowIndex="1">
+               <children>
+                  <CheckBox fx:id="archiveCheckbox" alignment="CENTER" mnemonicParsing="false" text="Показать архивные дела" textAlignment="CENTER" wrapText="true">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <padding>
+                        <Insets left="10.0" />
+                     </padding>
+                  </CheckBox>
+                  <Label fx:id="numberLabel" text="Выбрано дел:">
+                     <font>
+                        <Font name="System Bold Italic" size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+            <Button fx:id="applyFilterButton" alignment="CENTER" mnemonicParsing="false" onAction="#applyFilters" prefHeight="50.0" prefWidth="100.0" text="Установить фильтры" textAlignment="CENTER" wrapText="true" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
-               <padding>
-                  <Insets left="10.0" />
-               </padding>
-            </CheckBox>
-            <Label fx:id="numberLabel" text="Выбрано дел:">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </Button>
+            <Button fx:id="dropFilterButton" alignment="CENTER" mnemonicParsing="false" onAction="#dropFilters" prefHeight="50.0" prefWidth="90.0" text="Сбросить фильтры" textAlignment="CENTER" wrapText="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <font>
-                  <Font name="System Bold Italic" size="14.0" />
+                  <Font size="14.0" />
+               </font>
+            </Button>
+            <Label fx:id="filterLabel" alignment="CENTER" text="Установлены фильтры" textAlignment="CENTER" textFill="RED" wrapText="true" GridPane.columnIndex="2">
+               <font>
+                  <Font name="Arial Unicode MS" size="18.0" />
                </font>
             </Label>
          </children>
-      </VBox>
-      <TableView fx:id="tableView" style="-fx-selection-bar: #E1E1E1;" GridPane.columnSpan="4" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
+      </GridPane>
+      <TableView fx:id="tableView" centerShape="false" style="-fx-selection-bar: #E1E1E1;" VBox.vgrow="ALWAYS">
         <columns>
           <TableColumn fx:id="courtColumn" prefWidth="-1.0" text="Суд" />
             <TableColumn fx:id="numberColumn" prefWidth="-1.0" text="№ дела" />
@@ -146,23 +168,5 @@
             <TableColumn fx:id="dateColumn" prefWidth="-1.0" text="Текущая дата с/з" />
         </columns>
       </TableView>
-      <Button fx:id="applyFilterButton" alignment="CENTER" mnemonicParsing="false" onAction="#applyFilters" prefHeight="50.0" prefWidth="100.0" text="Установить фильтры" textAlignment="CENTER" wrapText="true" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
-         <font>
-            <Font size="14.0" />
-         </font>
-         <GridPane.margin>
-            <Insets />
-         </GridPane.margin>
-      </Button>
-      <Button fx:id="dropFilterButton" alignment="CENTER" mnemonicParsing="false" onAction="#dropFilters" prefHeight="50.0" prefWidth="90.0" text="Сбросить фильтры" textAlignment="CENTER" wrapText="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Button>
-      <Label fx:id="filterLabel" alignment="CENTER" text="Установлены фильтры" textAlignment="CENTER" textFill="RED" wrapText="true" GridPane.columnIndex="2">
-         <font>
-            <Font name="Arial Unicode MS" size="18.0" />
-         </font>
-      </Label>
    </children>
-</GridPane>
+</VBox>

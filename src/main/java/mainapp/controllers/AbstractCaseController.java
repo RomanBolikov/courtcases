@@ -1,5 +1,6 @@
 package mainapp.controllers;
 
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -20,7 +21,7 @@ import mainapp.data.Representative;
 
 
 public abstract class AbstractCaseController {
-
+	
 // 	FXML GUI elements
 
 	@FXML
@@ -73,6 +74,25 @@ public abstract class AbstractCaseController {
 
 //  *********************************************
 
+
+	protected ChangeListener<? super Boolean> hourListener = (obs, oldValue, newValue) -> {
+		if (!newValue) {
+			if (!hourTextField.getText().matches("^(0?[89]|1[0-7])$")) {
+				hourTextField.setText("");
+				new CustomAlert("Ошибка ввода", "", "Неверный ввод в поле \"часы\"", ButtonType.OK).show();
+			}
+		}
+	};
+	
+	protected ChangeListener<? super Boolean> minuteListener = (obs, oldValue, newValue) -> {
+		if (!newValue) {
+			if (!minuteTextField.getText().matches("[0-5][05]")) {
+				minuteTextField.setText("");
+				new CustomAlert("Ошибка ввода", "", "Неверный ввод в поле \"минуты\"", ButtonType.OK).show();
+			}
+		}
+	};
+	
 // 	Abstract FXML-annotated methods
 
 	public abstract void initialize();

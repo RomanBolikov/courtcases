@@ -85,24 +85,11 @@ public class EditCaseController extends AbstractCaseController {
 				return new Court(string);
 			}
 		});
+		
 		// set restrictions on inputs into hour and minute textfields
-		hourTextField.focusedProperty().addListener((obs, oldValue, newValue) -> {
-			if (!newValue) {
-				if (!hourTextField.getText().matches("^(0?9|1[0-7])$")) {
-					hourTextField.setText("");
-					new CustomAlert("Ошибка ввода", "", "Неверный ввод в поле \"часы\"", ButtonType.OK).show();
-				}
-			}
-		});
-
-		minuteTextField.focusedProperty().addListener((obs, oldValue, newValue) -> {
-			if (!newValue) {
-				if (!minuteTextField.getText().matches("[0-5][05]")) {
-					minuteTextField.setText("");
-					new CustomAlert("Ошибка ввода", "", "Неверный ввод в поле \"минуты\"", ButtonType.OK).show();
-				}
-			}
-		});
+		// listeners defined in AbstractCaseController
+		hourTextField.focusedProperty().addListener(hourListener);
+		minuteTextField.focusedProperty().addListener(minuteListener);
 
 		// limit input into TextAreas to 300 characters
 		description.setTextFormatter(

@@ -78,23 +78,10 @@ public class AddCaseController extends AbstractCaseController {
 		});
 
 		// set restrictions on inputs into hour and minute textfields
-		hourTextField.focusedProperty().addListener((obs, oldValue, newValue) -> {
-			if (!newValue) {
-				if (!hourTextField.getText().matches("[0-1][0-9]")) {
-					hourTextField.setText("");
-					new CustomAlert("Ошибка ввода", "", "Неверный ввод в поле \"часы\"", ButtonType.OK).show();
-				}
-			}
-		});
-
-		minuteTextField.focusedProperty().addListener((obs, oldValue, newValue) -> {
-			if (!newValue) {
-				if (!minuteTextField.getText().matches("[0-6][05]")) {
-					minuteTextField.setText("");
-					new CustomAlert("Ошибка ввода", "", "Неверный ввод в поле \"минуты\"", ButtonType.OK).show();
-				}
-			}
-		});
+		// listeners defined in AbstractCaseController
+		hourTextField.focusedProperty().addListener(hourListener);
+		minuteTextField.focusedProperty().addListener(minuteListener);
+		
 		// limit input into plaintiff anf defendant TextFields to 200 characters
 		plaintiffTextField.setTextFormatter(
 				new TextFormatter<String>(change -> change.getControlNewText().length() <= 200 ? change : null));

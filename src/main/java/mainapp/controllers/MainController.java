@@ -389,7 +389,7 @@ public class MainController {
 	@FXML
 	private void createReport(ActionEvent actionEvent) {
 		DirectoryChooser dialog = new DirectoryChooser();
-		dialog.setInitialDirectory(new File("C:/Prog/Java/Spring/testdir"));
+		dialog.setInitialDirectory(new File(System.getProperty("user.dir")));
 		File saveDir = dialog.showDialog(stage);
 		if (saveDir == null)
 			return;
