@@ -1,7 +1,6 @@
 package mainapp.services.impl;
 
-import javax.persistence.OptimisticLockException;
-
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import javafx.collections.FXCollections;
@@ -44,7 +43,7 @@ public class CourtServiceImpl implements CourtService {
 	public Court addCourt(Court newCourt) throws SaveEntityException {
 		try {
 			return courtRepo.save(newCourt);
-		} catch (OptimisticLockException ole) {
+		} catch (ObjectOptimisticLockingFailureException ole) {
 			throw new SaveEntityException("An OptimisticLockException has occurred");
 		}
 	}

@@ -2,8 +2,7 @@ package mainapp.services.impl;
 
 import java.util.List;
 
-import javax.persistence.OptimisticLockException;
-
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import javafx.collections.FXCollections;
@@ -52,7 +51,7 @@ public class CaseServiceImpl implements CaseService {
 	public ACase saveCase(ACase acase) throws SaveEntityException {
 		try {
 			return caseRepo.save(acase);
-		} catch (OptimisticLockException ole) {
+		} catch (ObjectOptimisticLockingFailureException ole) {
 			throw new SaveEntityException("An OptimisticLockException has occurred");
 		}
 	}
@@ -63,7 +62,7 @@ public class CaseServiceImpl implements CaseService {
 			ACase acase = caseRepo.findById(id)
 					.orElseThrow(() -> new SaveEntityException("Representative not found in database"));
 			caseRepo.delete(acase);
-		} catch (OptimisticLockException ole) {
+		} catch (ObjectOptimisticLockingFailureException ole) {
 			throw new SaveEntityException("An OptimisticLockException has occurred");
 		}
 		

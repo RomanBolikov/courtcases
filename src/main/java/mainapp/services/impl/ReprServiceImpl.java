@@ -1,7 +1,7 @@
 package mainapp.services.impl;
 
-import javax.persistence.OptimisticLockException;
 
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import javafx.collections.FXCollections;
@@ -34,7 +34,7 @@ public class ReprServiceImpl implements ReprService {
 	public Representative addNewRepr(Representative newRepr) throws SaveEntityException {
 		try {
 			return reprRepo.save(newRepr);
-		} catch (OptimisticLockException ole) {
+		} catch (ObjectOptimisticLockingFailureException ole) {
 			throw new SaveEntityException("An OptimisticLockException has occurred");
 		}
 	}
@@ -48,7 +48,7 @@ public class ReprServiceImpl implements ReprService {
 		repr.setIsAdmin(updatedRepr.getIsAdmin());
 		try {
 			return reprRepo.save(repr);
-		} catch (OptimisticLockException ole) {
+		} catch (ObjectOptimisticLockingFailureException ole) {
 			throw new SaveEntityException("An OptimisticLockException has occurred");
 		}
 	}
@@ -59,7 +59,7 @@ public class ReprServiceImpl implements ReprService {
 			Representative repr = reprRepo.findById(id)
 					.orElseThrow(() -> new SaveEntityException("Representative not found in database"));
 			reprRepo.delete(repr);
-		} catch (OptimisticLockException ole) {
+		} catch (ObjectOptimisticLockingFailureException ole) {
 			throw new SaveEntityException("An OptimisticLockException has occurred");
 		}
 	}
