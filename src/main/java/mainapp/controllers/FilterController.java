@@ -21,7 +21,6 @@ import mainapp.services.CourtService;
 import mainapp.services.ReprService;
 import net.rgielen.fxweaver.core.FxmlView;
 
-
 @Component
 @FxmlView("setfilters.fxml")
 public class FilterController {
@@ -29,9 +28,9 @@ public class FilterController {
 	private Stage stage;
 
 	private MainController parent;
-	
+
 	private final CourtService courtService;
-	
+
 	private final ReprService reprService;
 
 	private final CaseFilter caseFilter;
@@ -40,7 +39,7 @@ public class FilterController {
 		this.caseFilter = caseFilter;
 		this.courtService = courtService;
 		this.reprService = reprService;
-		
+
 	}
 
 	@FXML
@@ -81,9 +80,9 @@ public class FilterController {
 		stage.setScene(new Scene(gridPane));
 		caseTypeChoiceBox.setItems(FXCollections.observableArrayList(CaseType.values()));
 		relationChoiceBox.setItems(FXCollections.observableArrayList(Relation.values()));
-		representativeChoiceBox.setItems(reprService.getAllReprs()
-				.sorted((r1, r2) -> r1.getName().compareTo(r2.getName())));
-		courtChoiceBox.setItems(courtService.getAllCourts());
+		representativeChoiceBox
+				.setItems(reprService.getAllReprs().sorted((r1, r2) -> r1.getName().compareTo(r2.getName())));
+		courtChoiceBox.setItems(courtService.getAllCourts().sorted((c1, c2) -> c1.getName().compareTo(c2.getName())));
 	}
 
 	@FXML
