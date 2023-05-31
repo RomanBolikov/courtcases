@@ -34,7 +34,7 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 	private final FxWeaver fxWeaver;
 
 	private final ReprService reprService;
-	
+
 	private Representative user;
 
 	private CustomChoiceDialog choiceDialog;
@@ -108,7 +108,8 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 			Dialog<String> prompt = new PasswordInputDialog();
 			prompt.setHeaderText("Ввведите пароль");
 			CustomAlert alert = new CustomAlert("Ошибка ввода", "Введен неверный пароль!", "",
-					new ButtonType("Повторить", ButtonData.OK_DONE), new ButtonType("Закрыть", ButtonData.CANCEL_CLOSE));
+					new ButtonType("Повторить", ButtonData.OK_DONE),
+					new ButtonType("Закрыть", ButtonData.CANCEL_CLOSE));
 			while (true) {
 				Optional<String> input = prompt.showAndWait();
 				if (input.isPresent()) {
@@ -117,9 +118,11 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 						break;
 					} else {
 						Optional<ButtonType> retry = alert.showAndWait();
-						if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE) break;
+						if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE)
+							break;
 					}
-				} else break;
+				} else
+					break;
 			}
 		}
 	}
@@ -132,7 +135,7 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 		main.getController().setStage(stage);
 		main.getController().displayUser(user);
 	}
-	
+
 	private void loadAdminController() {
 		FxControllerAndView<AdminController, Parent> adminController = fxWeaver.load(AdminController.class);
 		stage.setScene(new Scene(adminController.getView().get()));
@@ -152,9 +155,11 @@ public class LoginController implements ApplicationListener<StageReadyEvent> {
 					break;
 				} else {
 					Optional<ButtonType> retry = alert.showAndWait();
-					if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE) break;
+					if (retry.isEmpty() || retry.get().getButtonData() == ButtonData.CANCEL_CLOSE)
+						break;
 				}
-			} else break;
+			} else
+				break;
 		}
 	}
 
